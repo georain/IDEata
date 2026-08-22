@@ -77,8 +77,9 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #3a3a4a; border-radius: 6px; }
 
-        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 10020; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; pointer-events: none; max-width: 420px; width: auto; }
-        .toast-item { background: rgba(30,30,46,0.9); backdrop-filter: blur(8px); border: 1px solid #3a3a4a; padding: 12px 18px; border-radius: 8px; font-size: 0.8rem; color: #c0c0d0; box-shadow: 0 8px 30px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 14px; pointer-events: auto; opacity: 0; transform: translateX(20px); transition: opacity 0.25s ease, transform 0.25s ease; max-width: 100%; width: 100%; min-width: 200px; word-break: break-word; }
+        /* Toast 容器 - 最高层级 */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; pointer-events: none; max-width: 420px; width: auto; }
+        .toast-item { background: rgba(30,30,46,0.92); backdrop-filter: blur(8px); border: 1px solid #3a3a4a; padding: 12px 18px; border-radius: 8px; font-size: 0.8rem; color: #c0c0d0; box-shadow: 0 8px 30px rgba(0,0,0,0.9); display: flex; align-items: center; gap: 14px; pointer-events: auto; opacity: 0; transform: translateX(20px); transition: opacity 0.25s ease, transform 0.25s ease; max-width: 100%; width: 100%; min-width: 200px; word-break: break-word; }
         .toast-item.show { opacity: 1; transform: translateX(0); }
         .toast-item .toast-msg { flex: 1; font-size: 0.8rem; line-height: 1.4; }
         .toast-item .toast-copy { cursor: pointer; color: #7a7a9a; font-size: 0.9rem; transition: 0.2s; background: transparent; border: none; padding: 0 4px; flex-shrink: 0; }
@@ -123,8 +124,7 @@
         #oobe-panel .oobe-icon { text-align: center; font-size: 3.2rem; margin-bottom: 16px; background: linear-gradient(135deg, #6a6a8a, #8a8aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         #oobe-panel h2 { font-size: 1.5rem; font-weight: 500; color: #ececf0; text-align: center; margin-bottom: 6px; letter-spacing: -0.3px; }
         #oobe-panel .subtitle { text-align: center; color: #9a9aaa; font-size: 0.9rem; margin-bottom: 28px; font-weight: 300; }
-        .oobe-option { display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: rgba(255,255,255,0.04); border-radius: 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.25s ease; border: 1px solid rgba(255,255,255,0.04); }
-        .oobe-option:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.08); transform: scale(1.01); }
+        .oobe-option { display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: rgba(255,255,255,0.04); border-radius: 16px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.04); }
         .oobe-option .icon { font-size: 1.4rem; width: 40px; text-align: center; color: #7a7a9a; }
         .oobe-option .info { flex: 1; }
         .oobe-option .info .title { font-size: 0.9rem; color: #e0e0e8; font-weight: 400; }
@@ -143,7 +143,6 @@
         .theme-light #oobe-panel h2 { color: #222; }
         .theme-light #oobe-panel .subtitle { color: #666; }
         .theme-light .oobe-option { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.04); }
-        .theme-light .oobe-option:hover { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.08); }
         .theme-light .oobe-option .info .title { color: #333; }
         .theme-light .oobe-option .info .desc { color: #777; }
         .theme-light .oobe-actions .btn-secondary { background: rgba(0,0,0,0.04); color: #666; }
@@ -228,7 +227,7 @@
 
             <div class="oobe-actions">
                 <button class="btn-secondary" id="oobe-skip">跳过设置</button>
-                <button class="btn-primary" id="oobe-continue" disabled>继续</button>
+                <button class="btn-primary" id="oobe-continue">继续</button>
             </div>
         </div>
     </div>
@@ -423,12 +422,10 @@
             }
 
             function checkOOBEStatus() {
-                // 检查URL hash是否包含 #OOBE
                 if (window.location.hash === '#OOBE') {
                     showOOBE();
                     return;
                 }
-
                 const completed = getCookie(COOKIE_KEYS.OOBE_COMPLETE);
                 if (!completed) {
                     setTimeout(() => {
@@ -437,35 +434,68 @@
                 }
             }
 
-            function updateOOBEButton() {
-                if (oobeGithubDone || oobeVscodeDone) {
-                    oobeContinue.disabled = false;
-                } else {
-                    oobeContinue.disabled = true;
-                }
-            }
-
             // 监听hash变化
             window.addEventListener('hashchange', function() {
                 if (window.location.hash === '#OOBE') {
-                    // 如果已经完成OOBE，重新打开
                     showOOBE();
                 } else {
-                    // 如果OOBE是打开的且hash被移除，关闭它
                     if (oobeOverlay.classList.contains('open')) {
                         hideOOBE();
                     }
                 }
             });
 
-            // GitHub OOBE 点击
-            oobeGithub.addEventListener('click', function() {
-                startGitHubOAuth(true);
+            // OOBE 继续按钮 - 执行所有选中的操作
+            oobeContinue.addEventListener('click', function() {
+                // 检查是否勾选了GitHub登录
+                if (oobeGithubDone) {
+                    // 已经登录，跳过
+                } else {
+                    // 未登录，触发GitHub登录
+                    startGitHubOAuth(true);
+                }
+                // 检查是否导入了VSCode设置
+                if (oobeVscodeDone) {
+                    // 已导入，跳过
+                } else {
+                    // 未导入，打开文件选择器
+                    hiddenVscodeInput.click();
+                }
+                // 如果两项都完成了，关闭OOBE
+                if (oobeGithubDone && oobeVscodeDone) {
+                    completeOOBE();
+                }
             });
 
-            // VSCode OOBE 点击
+            // OOBE 跳过
+            oobeSkip.addEventListener('click', function() {
+                completeOOBE();
+            });
+
+            // GitHub选项点击 - 切换状态（标记为已选，实际登录在点击继续时执行）
+            oobeGithub.addEventListener('click', function() {
+                if (!oobeGithubDone) {
+                    // 如果未登录，标记为待登录
+                    oobeGithubDone = true;
+                    oobeGithubStatus.textContent = '待登录...';
+                    oobeGithubStatus.className = 'status';
+                } else {
+                    // 如果已登录或待登录，取消选择
+                    oobeGithubDone = false;
+                    oobeGithubStatus.textContent = '未登录';
+                    oobeGithubStatus.className = 'status';
+                }
+            });
+
+            // VSCode选项点击 - 立即选择文件（但实际导入在点击继续时执行）
             oobeVscode.addEventListener('click', function() {
-                hiddenVscodeInput.click();
+                if (!oobeVscodeDone) {
+                    hiddenVscodeInput.click();
+                } else {
+                    oobeVscodeDone = false;
+                    oobeVscodeStatus.textContent = '未导入';
+                    oobeVscodeStatus.className = 'status';
+                }
             });
 
             // 处理VSCode文件选择（OOBE）
@@ -476,13 +506,12 @@
                     reader.onload = function(ev) {
                         try {
                             const settings = JSON.parse(ev.target.result);
-                            setCookie(COOKIE_KEYS.VSCODE_SETTINGS, settings);
-                            applyVSCodeSettings(settings);
+                            // 暂存设置，在点击继续时应用
+                            window._pendingVscodeSettings = settings;
                             oobeVscodeDone = true;
-                            oobeVscodeStatus.textContent = '已导入 ✓';
+                            oobeVscodeStatus.textContent = '已选择 ✓';
                             oobeVscodeStatus.className = 'status done';
-                            updateOOBEButton();
-                            showToast('VSCode 设置导入成功');
+                            showToast('VSCode 设置文件已选择，点击继续完成导入');
                         } catch (err) {
                             showToast('解析 settings.json 失败: ' + err.message, true);
                         }
@@ -492,24 +521,18 @@
                 this.value = '';
             });
 
-            // OOBE 跳过
-            oobeSkip.addEventListener('click', function() {
-                completeOOBE();
-            });
-
-            // OOBE 继续
-            oobeContinue.addEventListener('click', function() {
-                completeOOBE();
-            });
-
             function completeOOBE() {
+                // 应用待处理的VSCode设置
+                if (window._pendingVscodeSettings) {
+                    applyVSCodeSettings(window._pendingVscodeSettings);
+                    setCookie(COOKIE_KEYS.VSCODE_SETTINGS, window._pendingVscodeSettings);
+                    window._pendingVscodeSettings = null;
+                }
                 hideOOBE();
                 setCookie(COOKIE_KEYS.OOBE_COMPLETE, true);
-                // 清除URL中的#OOBE
                 if (window.location.hash === '#OOBE') {
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
-                // 如果既没登录也没导入设置，添加默认示例文件
                 if (fileMap.size === 0) {
                     const sampleContent = `// IDEata
 // 点击「文件」→ 打开文件夹 或 打开文件
@@ -651,7 +674,7 @@
                 }
             }
 
-            // ----- Toast -----
+            // ----- Toast - 支持复制 -----
             function showToast(message, isError = false) {
                 const item = document.createElement('div');
                 item.className = 'toast-item' + (isError ? ' error' : '');
@@ -661,23 +684,20 @@
                 const copyBtn = document.createElement('button');
                 copyBtn.className = 'toast-copy';
                 copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                copyBtn.setAttribute('aria-label', '复制错误信息');
                 copyBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    navigator.clipboard.writeText(message).then(() => {
-                        const orig = copyBtn.innerHTML;
-                        copyBtn.innerHTML = '<i class="fas fa-check"></i>';
-                        setTimeout(() => copyBtn.innerHTML = orig, 1500);
-                    }).catch(() => {
-                        const ta = document.createElement('textarea');
-                        ta.value = message;
-                        document.body.appendChild(ta);
-                        ta.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(ta);
-                        const orig = copyBtn.innerHTML;
-                        copyBtn.innerHTML = '<i class="fas fa-check"></i>';
-                        setTimeout(() => copyBtn.innerHTML = orig, 1500);
-                    });
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(message).then(() => {
+                            const orig = copyBtn.innerHTML;
+                            copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                            setTimeout(() => copyBtn.innerHTML = orig, 1500);
+                        }).catch(() => {
+                            fallbackCopy(message, copyBtn);
+                        });
+                    } else {
+                        fallbackCopy(message, copyBtn);
+                    }
                 });
                 item.appendChild(msgSpan);
                 item.appendChild(copyBtn);
@@ -688,6 +708,24 @@
                     setTimeout(() => item.remove(), 400);
                 }, isError ? 10000 : 5000);
                 return item;
+            }
+
+            function fallbackCopy(message, copyBtn) {
+                const ta = document.createElement('textarea');
+                ta.value = message;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                try {
+                    document.execCommand('copy');
+                    const orig = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => copyBtn.innerHTML = orig, 1500);
+                } catch (e) {
+                    // ignore
+                }
+                document.body.removeChild(ta);
             }
 
             // ----- Storage check -----
@@ -1227,7 +1265,6 @@
                         oobeGithubDone = true;
                         oobeGithubStatus.textContent = `已登录: ${login}`;
                         oobeGithubStatus.className = 'status done';
-                        updateOOBEButton();
                     }
 
                     showToast(`已登录为 ${login}`);
@@ -1279,7 +1316,6 @@
                 restoreState();
                 await handleOAuthCallback();
 
-                // 如果没有文件，添加示例
                 if (fileMap.size === 0) {
                     const sampleContent = `// IDEata
 // 点击「文件」→ 打开文件夹 或 打开文件
@@ -1297,7 +1333,6 @@
                 }
                 updateStatusFiles();
 
-                // 检查首次启动或URL hash - 显示OOBE
                 checkOOBEStatus();
 
                 setTimeout(() => editor.focus(), 300);
