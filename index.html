@@ -77,7 +77,6 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #3a3a4a; border-radius: 6px; }
 
-        /* Toast 容器 - 最高层级 */
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; pointer-events: none; max-width: 420px; width: auto; }
         .toast-item { background: rgba(30,30,46,0.92); backdrop-filter: blur(8px); border: 1px solid #3a3a4a; padding: 12px 18px; border-radius: 8px; font-size: 0.8rem; color: #c0c0d0; box-shadow: 0 8px 30px rgba(0,0,0,0.9); display: flex; align-items: center; gap: 14px; pointer-events: auto; opacity: 0; transform: translateX(20px); transition: opacity 0.25s ease, transform 0.25s ease; max-width: 100%; width: 100%; min-width: 200px; word-break: break-word; }
         .toast-item.show { opacity: 1; transform: translateX(0); }
@@ -114,7 +113,6 @@
         .logged-in #github-login-status i.fa-check-circle { color: #6aba6a; }
         #github-login-status:not(.logged-in) { display: none; }
 
-        /* OOBE 设置向导 - Apple质感 */
         #oobe-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 10050; display: none; align-items: center; justify-content: center; animation: oobeFadeIn 0.6s cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards; }
         #oobe-overlay.open { display: flex; }
         @keyframes oobeFadeIn { 0% { opacity: 0; transform: scale(1.02); } 100% { opacity: 1; transform: scale(1); } }
@@ -200,13 +198,11 @@
     <div id="bg-image"></div>
     <div id="toast-container"></div>
 
-    <!-- OOBE 设置向导 - Apple质感 -->
     <div id="oobe-overlay">
         <div id="oobe-panel">
             <div class="oobe-icon"><i class="fas fa-code"></i></div>
             <h2>欢迎使用 IDEata</h2>
             <p class="subtitle">完成以下设置以开始您的编码之旅</p>
-
             <div class="oobe-option" id="oobe-github">
                 <div class="icon"><i class="fab fa-github"></i></div>
                 <div class="info">
@@ -215,7 +211,6 @@
                 </div>
                 <div class="status" id="oobe-github-status">未登录</div>
             </div>
-
             <div class="oobe-option" id="oobe-vscode">
                 <div class="icon"><i class="fas fa-cog"></i></div>
                 <div class="info">
@@ -224,7 +219,6 @@
                 </div>
                 <div class="status" id="oobe-vscode-status">未导入</div>
             </div>
-
             <div class="oobe-actions">
                 <button class="btn-secondary" id="oobe-skip">跳过设置</button>
                 <button class="btn-primary" id="oobe-continue">继续</button>
@@ -278,7 +272,6 @@
         </div>
     </div>
 
-    <!-- 设置浮层 -->
     <div id="settings-overlay">
         <div id="settings-panel">
             <h2>设置</h2>
@@ -308,7 +301,6 @@
         </div>
     </div>
 
-    <!-- 隐藏的文件输入 -->
     <input type="file" id="hidden-file-input" multiple webkitdirectory>
     <input type="file" id="hidden-single-file-input" multiple>
     <input type="file" id="hidden-vscode-input" accept=".json">
@@ -317,7 +309,6 @@
         (function() {
             "use strict";
 
-            // ----- Cookie 工具函数 -----
             function setCookie(name, value, days = 365) {
                 const expires = new Date(Date.now() + days * 86400000).toUTCString();
                 document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(JSON.stringify(value))}; expires=${expires}; path=/; SameSite=Lax`;
@@ -335,7 +326,7 @@
                 document.cookie = `${encodeURIComponent(name)}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
             }
 
-            // ----- DOM 引用 -----
+            // DOM
             const editor = document.getElementById('editor-textarea');
             const fileTreeEl = document.getElementById('file-tree');
             const editorTabs = document.getElementById('editor-tabs');
@@ -368,7 +359,6 @@
             const toastContainer = document.getElementById('toast-container');
             const sidebarToggle = document.getElementById('sidebar-toggle');
 
-            // OOBE 元素
             const oobeOverlay = document.getElementById('oobe-overlay');
             const oobeGithub = document.getElementById('oobe-github');
             const oobeVscode = document.getElementById('oobe-vscode');
@@ -377,7 +367,6 @@
             const oobeContinue = document.getElementById('oobe-continue');
             const oobeSkip = document.getElementById('oobe-skip');
 
-            // State
             const fileMap = new Map();
             let currentFileKey = null;
             let openTabs = [];
@@ -403,12 +392,11 @@
                 OOBE_COMPLETE: 'ideata_oobe_complete'
             };
 
-            // GitHub OAuth
             const GITHUB_CLIENT_ID = 'Ov23lirs6asQ9VFE6ywc';
             const REDIRECT_URI = window.location.origin + window.location.pathname;
             const SCOPE = 'read:user';
 
-            // ----- OOBE 控制 -----
+            // ----- OOBE -----
             function showOOBE() {
                 oobeOverlay.classList.remove('closing');
                 oobeOverlay.classList.add('open');
@@ -428,13 +416,10 @@
                 }
                 const completed = getCookie(COOKIE_KEYS.OOBE_COMPLETE);
                 if (!completed) {
-                    setTimeout(() => {
-                        showOOBE();
-                    }, 800);
+                    setTimeout(showOOBE, 800);
                 }
             }
 
-            // 监听hash变化
             window.addEventListener('hashchange', function() {
                 if (window.location.hash === '#OOBE') {
                     showOOBE();
@@ -445,49 +430,28 @@
                 }
             });
 
-            // OOBE 继续按钮 - 执行所有选中的操作
             oobeContinue.addEventListener('click', function() {
-                // 检查是否勾选了GitHub登录
-                if (oobeGithubDone) {
-                    // 已经登录，跳过
-                } else {
-                    // 未登录，触发GitHub登录
+                if (!oobeGithubDone) {
                     startGitHubOAuth(true);
                 }
-                // 检查是否导入了VSCode设置
-                if (oobeVscodeDone) {
-                    // 已导入，跳过
-                } else {
-                    // 未导入，打开文件选择器
+                if (!oobeVscodeDone) {
                     hiddenVscodeInput.click();
                 }
-                // 如果两项都完成了，关闭OOBE
                 if (oobeGithubDone && oobeVscodeDone) {
                     completeOOBE();
                 }
             });
 
-            // OOBE 跳过
             oobeSkip.addEventListener('click', function() {
                 completeOOBE();
             });
 
-            // GitHub选项点击 - 切换状态（标记为已选，实际登录在点击继续时执行）
             oobeGithub.addEventListener('click', function() {
-                if (!oobeGithubDone) {
-                    // 如果未登录，标记为待登录
-                    oobeGithubDone = true;
-                    oobeGithubStatus.textContent = '待登录...';
-                    oobeGithubStatus.className = 'status';
-                } else {
-                    // 如果已登录或待登录，取消选择
-                    oobeGithubDone = false;
-                    oobeGithubStatus.textContent = '未登录';
-                    oobeGithubStatus.className = 'status';
-                }
+                oobeGithubDone = !oobeGithubDone;
+                oobeGithubStatus.textContent = oobeGithubDone ? '待登录...' : '未登录';
+                oobeGithubStatus.className = oobeGithubDone ? 'status' : 'status';
             });
 
-            // VSCode选项点击 - 立即选择文件（但实际导入在点击继续时执行）
             oobeVscode.addEventListener('click', function() {
                 if (!oobeVscodeDone) {
                     hiddenVscodeInput.click();
@@ -498,7 +462,6 @@
                 }
             });
 
-            // 处理VSCode文件选择（OOBE）
             hiddenVscodeInput.addEventListener('change', function(e) {
                 if (this.files.length > 0) {
                     const file = this.files[0];
@@ -506,7 +469,6 @@
                     reader.onload = function(ev) {
                         try {
                             const settings = JSON.parse(ev.target.result);
-                            // 暂存设置，在点击继续时应用
                             window._pendingVscodeSettings = settings;
                             oobeVscodeDone = true;
                             oobeVscodeStatus.textContent = '已选择 ✓';
@@ -522,7 +484,6 @@
             });
 
             function completeOOBE() {
-                // 应用待处理的VSCode设置
                 if (window._pendingVscodeSettings) {
                     applyVSCodeSettings(window._pendingVscodeSettings);
                     setCookie(COOKIE_KEYS.VSCODE_SETTINGS, window._pendingVscodeSettings);
@@ -534,9 +495,7 @@
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
                 if (fileMap.size === 0) {
-                    const sampleContent = `// IDEata
-// 点击「文件」→ 打开文件夹 或 打开文件
-// 设置中可调整主题、背景等`;
+                    const sampleContent = `// IDEata\n// 点击「文件」→ 打开文件夹 或 打开文件\n// 设置中可调整主题、背景等`;
                     const key = addFile('README.md', sampleContent);
                     openTabs.push(key);
                     renderFileTree();
@@ -546,7 +505,6 @@
                 showToast('设置完成，欢迎使用 IDEata');
             }
 
-            // ----- 应用 VSCode 设置 -----
             function applyVSCodeSettings(settings) {
                 try {
                     if (settings['editor.fontSize']) {
@@ -580,101 +538,7 @@
                 }
             }
 
-            // ----- 存储与恢复 -----
-            function saveState() {
-                const filesData = {};
-                let count = 0;
-                for (const [key, file] of fileMap) {
-                    if (count >= 10) break;
-                    filesData[key] = { name: file.name, content: file.content, lang: file.lang, icon: file.icon,
-                    path: file.path };
-                    count++;
-                }
-                setCookie(COOKIE_KEYS.FILES, filesData);
-                setCookie(COOKIE_KEYS.CURRENT_FILE, currentFileKey);
-                setCookie(COOKIE_KEYS.OPEN_TABS, openTabs);
-                setCookie(COOKIE_KEYS.THEME, isDark ? 'dark' : 'light');
-                setCookie(COOKIE_KEYS.BG_COLOR, customBg);
-                if (bgImageData) setCookie(COOKIE_KEYS.BG_IMAGE, bgImageData);
-                setCookie(COOKIE_KEYS.BG_BLUR, bgBlurInput.value);
-                const collapsed = fileTreeEl.classList.contains('collapsed');
-                setCookie(COOKIE_KEYS.SIDEBAR, collapsed ? 'collapsed' : 'expanded');
-            }
-
-            function restoreState() {
-                const filesData = getCookie(COOKIE_KEYS.FILES);
-                if (filesData) {
-                    for (const [key, data] of Object.entries(filesData)) {
-                        fileMap.set(key, data);
-                    }
-                }
-
-                const current = getCookie(COOKIE_KEYS.CURRENT_FILE);
-                if (current) currentFileKey = current;
-
-                const tabs = getCookie(COOKIE_KEYS.OPEN_TABS);
-                if (tabs && Array.isArray(tabs)) openTabs = tabs;
-
-                const theme = getCookie(COOKIE_KEYS.THEME);
-                if (theme === 'light') {
-                    isDark = false;
-                    document.getElementById('ide').classList.add('theme-light');
-                    themeToggle.textContent = '亮色';
-                } else {
-                    isDark = true;
-                    document.getElementById('ide').classList.remove('theme-light');
-                    themeToggle.textContent = '暗色';
-                }
-
-                const bgColor = getCookie(COOKIE_KEYS.BG_COLOR);
-                if (bgColor) {
-                    customBg = bgColor;
-                    bgColorInput.value = bgColor;
-                    applyBg(bgColor);
-                }
-
-                const bgImageDataRestored = getCookie(COOKIE_KEYS.BG_IMAGE);
-                if (bgImageDataRestored) {
-                    bgImageData = bgImageDataRestored;
-                    bgImage.style.backgroundImage = `url(${bgImageDataRestored})`;
-                    bgImage.style.backgroundSize = 'cover';
-                    bgImage.style.backgroundPosition = 'center';
-                    bgImage.classList.add('loaded');
-                    bgLayer.style.background = 'transparent';
-                }
-
-                const blur = getCookie(COOKIE_KEYS.BG_BLUR);
-                if (blur) {
-                    bgBlurInput.value = blur;
-                    blurValue.textContent = blur + 'px';
-                    const blurVal = `blur(${blur}px)`;
-                    bgImage.style.backdropFilter = blurVal;
-                    document.querySelectorAll('#file-tree, #editor-tabs, #editor-textarea, #editor-status, #status-bar, #settings-panel, .toast-item')
-                        .forEach(el => {
-                            el.style.backdropFilter = blurVal;
-                        });
-                }
-
-                const sidebar = getCookie(COOKIE_KEYS.SIDEBAR);
-                if (sidebar === 'collapsed') {
-                    applySidebarState(true);
-                } else {
-                    applySidebarState(false);
-                }
-
-                const githubUser = getCookie(COOKIE_KEYS.GITHUB_USER);
-                const githubToken = getCookie(COOKIE_KEYS.GITHUB_TOKEN);
-                if (githubUser && githubToken) {
-                    setLoggedIn(githubUser, githubToken);
-                }
-
-                const vscodeSettings = getCookie(COOKIE_KEYS.VSCODE_SETTINGS);
-                if (vscodeSettings) {
-                    applyVSCodeSettings(vscodeSettings);
-                }
-            }
-
-            // ----- Toast - 支持复制 -----
+            // ----- Toast -----
             function showToast(message, isError = false) {
                 const item = document.createElement('div');
                 item.className = 'toast-item' + (isError ? ' error' : '');
@@ -684,7 +548,7 @@
                 const copyBtn = document.createElement('button');
                 copyBtn.className = 'toast-copy';
                 copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
-                copyBtn.setAttribute('aria-label', '复制错误信息');
+                copyBtn.setAttribute('aria-label', '复制');
                 copyBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -692,9 +556,7 @@
                             const orig = copyBtn.innerHTML;
                             copyBtn.innerHTML = '<i class="fas fa-check"></i>';
                             setTimeout(() => copyBtn.innerHTML = orig, 1500);
-                        }).catch(() => {
-                            fallbackCopy(message, copyBtn);
-                        });
+                        }).catch(() => fallbackCopy(message, copyBtn));
                     } else {
                         fallbackCopy(message, copyBtn);
                     }
@@ -722,107 +584,293 @@
                     const orig = copyBtn.innerHTML;
                     copyBtn.innerHTML = '<i class="fas fa-check"></i>';
                     setTimeout(() => copyBtn.innerHTML = orig, 1500);
-                } catch (e) {
-                    // ignore
-                }
+                } catch (e) {}
                 document.body.removeChild(ta);
             }
 
-            // ----- Storage check -----
             function isStorageAvailable() {
                 try { sessionStorage.setItem('_test', '1');
                     sessionStorage.removeItem('_test'); return true; } catch (e) { return false; }
             }
 
-            // ----- File menu handling -----
-            function positionFileMenu() {
-                const btnRect = fileMenuBtn.getBoundingClientRect();
-                const menuRect = fileMenu.getBoundingClientRect();
-                const spacing = 6;
-                let left = Math.round(btnRect.left);
-                if (left + menuRect.width > window.innerWidth - 10) {
-                    left = Math.max(10, window.innerWidth - menuRect.width - 10);
+            // ----- GitHub OAuth (PKCE with fallback) -----
+            function generateRandomString(length) {
+                const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+                let result = '';
+                for (let i = 0; i < length; i++) result += possible.charAt(Math.floor(Math.random() * possible.length));
+                return result;
+            }
+
+            // 安全的SHA-256，带降级方案
+            async function safeSha256(plain) {
+                try {
+                    if (window.crypto && window.crypto.subtle && window.crypto.subtle.digest) {
+                        const encoder = new TextEncoder();
+                        const data = encoder.encode(plain);
+                        const hash = await window.crypto.subtle.digest('SHA-256', data);
+                        return hash;
+                    }
+                } catch (e) {
+                    console.warn('crypto.subtle不可用，使用降级方案');
                 }
-                let top = Math.round(btnRect.bottom + spacing);
-                if (top + menuRect.height > window.innerHeight - 10) {
-                    top = Math.max(10, btnRect.top - menuRect.height - spacing);
+                // 降级方案：返回一个基于字符串的简单哈希
+                let hash = 0;
+                for (let i = 0; i < plain.length; i++) {
+                    const char = plain.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
                 }
-                fileMenu.style.left = left + 'px';
-                fileMenu.style.top = top + 'px';
+                // 模拟ArrayBuffer
+                const buf = new ArrayBuffer(32);
+                const view = new DataView(buf);
+                view.setInt32(0, hash);
+                view.setInt32(8, hash >>> 16);
+                view.setInt32(16, hash >>> 8);
+                view.setInt32(24, hash >>> 4);
+                return buf;
             }
 
-            function openFileMenu() {
-                menuOpen = true;
-                fileMenu.classList.add('open');
-                fileMenu.setAttribute('aria-hidden', 'false');
-                fileMenuBtn.setAttribute('aria-expanded', 'true');
-                positionFileMenu();
-                setTimeout(() => {
-                    window.addEventListener('resize', onWindowHideMenu);
-                    window.addEventListener('scroll', onWindowHideMenu, true);
-                    document.addEventListener('keydown', onEscapeHideMenu);
-                }, 0);
+            function base64url(buffer) {
+                const bytes = new Uint8Array(buffer);
+                let binary = '';
+                for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+                return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
             }
 
-            function closeFileMenu() {
-                menuOpen = false;
-                fileMenu.classList.remove('open');
-                fileMenu.setAttribute('aria-hidden', 'true');
-                fileMenuBtn.setAttribute('aria-expanded', 'false');
-                window.removeEventListener('resize', onWindowHideMenu);
-                window.removeEventListener('scroll', onWindowHideMenu, true);
-                document.removeEventListener('keydown', onEscapeHideMenu);
+            async function startGitHubOAuth(fromOOBE = false) {
+                if (!isStorageAvailable()) {
+                    showToast('存储不可用，请使用非沙盒环境打开', true);
+                    return;
+                }
+                try {
+                    const verifier = generateRandomString(64);
+                    const state = generateRandomString(32);
+                    sessionStorage.setItem('oauth_verifier', verifier);
+                    sessionStorage.setItem('oauth_state', state);
+
+                    const hash = await safeSha256(verifier);
+                    const challenge = base64url(hash);
+
+                    const params = new URLSearchParams({
+                        client_id: GITHUB_CLIENT_ID,
+                        redirect_uri: REDIRECT_URI,
+                        response_type: 'code',
+                        scope: SCOPE,
+                        state: state,
+                        code_challenge: challenge,
+                        code_challenge_method: 'S256'
+                    });
+                    if (fromOOBE) {
+                        sessionStorage.setItem('oobe_pending', 'true');
+                    }
+                    window.location.href = `https://github.com/login/oauth/authorize?${params.toString()}`;
+                } catch (err) {
+                    showToast('OAuth 启动失败: ' + err.message, true);
+                }
             }
 
-            function toggleMenu(open) {
-                const should = (open !== undefined) ? !!open : !menuOpen;
-                if (should) openFileMenu();
-                else closeFileMenu();
+            async function handleOAuthCallback() {
+                if (!isStorageAvailable()) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (urlParams.get('code')) {
+                        showToast('存储不可用，无法完成回调', true);
+                        if (window.history && window.history.replaceState) {
+                            window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
+                        }
+                    }
+                    return false;
+                }
+                const urlParams = new URLSearchParams(window.location.search);
+                const code = urlParams.get('code');
+                const state = urlParams.get('state');
+                if (!code || !state) return false;
+                try {
+                    const savedState = sessionStorage.getItem('oauth_state');
+                    if (state !== savedState) { showToast('State 校验失败', true); return false; }
+                    const verifier = sessionStorage.getItem('oauth_verifier');
+                    if (!verifier) { showToast('未找到 verifier', true); return false; }
+                    sessionStorage.removeItem('oauth_state');
+                    sessionStorage.removeItem('oauth_verifier');
+                    const resp = await fetch('https://github.com/login/oauth/access_token', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({
+                            client_id: GITHUB_CLIENT_ID,
+                            code: code,
+                            redirect_uri: REDIRECT_URI,
+                            code_verifier: verifier
+                        })
+                    });
+                    const data = await resp.json();
+                    if (data.error) { showToast('Token 交换失败: ' + data.error_description, true); return false; }
+                    const accessToken = data.access_token;
+                    if (!accessToken) { showToast('未获得 access_token', true); return false; }
+                    const userResp = await fetch('https://api.github.com/user', {
+                        headers: { 'Authorization': `token ${accessToken}`, 'Accept': 'application/json' }
+                    });
+                    if (!userResp.ok) { showToast('获取用户信息失败', true); return false; }
+                    const user = await userResp.json();
+                    const login = user.login || '用户';
+                    setLoggedIn(login, accessToken);
+
+                    const fromOOBE = sessionStorage.getItem('oobe_pending');
+                    if (fromOOBE) {
+                        sessionStorage.removeItem('oobe_pending');
+                        oobeGithubDone = true;
+                        oobeGithubStatus.textContent = `已登录: ${login}`;
+                        oobeGithubStatus.className = 'status done';
+                    }
+
+                    showToast(`已登录为 ${login}`);
+                    if (window.history && window.history.replaceState) {
+                        window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
+                    }
+                    return true;
+                } catch (err) {
+                    showToast('OAuth 回调处理失败: ' + err.message, true);
+                    return false;
+                }
             }
 
-            function onWindowHideMenu() { closeFileMenu(); }
+            let loggedIn = false;
 
-            function onEscapeHideMenu(e) { if (e.key === 'Escape') closeFileMenu(); }
+            function setLoggedIn(user, accessToken) {
+                loggedIn = true;
+                githubUserLabel.textContent = user;
+                githubStatus.innerHTML =
+                    `<i class="fab fa-github"></i> ${user} <i class="fas fa-check-circle" style="color:#6aba6a;margin-left:4px;"></i>`;
+                githubStatus.classList.add('logged-in');
+                document.getElementById('ide').classList.add('logged-in');
+                githubLoginBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> 登出`;
+                statusGit.innerHTML = `<i class="fas fa-github"></i> ${user}`;
+                setCookie(COOKIE_KEYS.GITHUB_USER, user);
+                setCookie(COOKIE_KEYS.GITHUB_TOKEN, accessToken);
+            }
 
-            fileMenuBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleMenu();
+            function logout() {
+                loggedIn = false;
+                githubUserLabel.textContent = '';
+                githubStatus.innerHTML = `<i class="fab fa-github"></i>`;
+                githubStatus.classList.remove('logged-in');
+                document.getElementById('ide').classList.remove('logged-in');
+                githubLoginBtn.innerHTML = `<i class="fab fa-github"></i> 登录`;
+                statusGit.innerHTML = `<i class="fas fa-github"></i> 未连接`;
+                removeCookie(COOKIE_KEYS.GITHUB_USER);
+                removeCookie(COOKIE_KEYS.GITHUB_TOKEN);
+                showToast('已登出');
+            }
+
+            githubLoginBtn.addEventListener('click', function() {
+                if (loggedIn) logout();
+                else startGitHubOAuth(false);
             });
 
-            document.addEventListener('click', (e) => {
-                if (menuOpen && !fileMenu.contains(e.target) && e.target !== fileMenuBtn) {
-                    toggleMenu(false);
+            // ----- File system (精简保留核心功能) -----
+            function saveState() {
+                const filesData = {};
+                let count = 0;
+                for (const [key, file] of fileMap) {
+                    if (count >= 10) break;
+                    filesData[key] = { name: file.name, content: file.content, lang: file.lang, icon: file.icon,
+                        path: file.path };
+                    count++;
                 }
-            });
-
-            fileMenu.style.backdropFilter = 'none';
-
-            menuOpenFolder.addEventListener('click', () => { toggleMenu(false);
-                hiddenFolderInput.click(); });
-            menuOpenFile.addEventListener('click', () => { toggleMenu(false);
-                hiddenFileInput.click(); });
-            menuDownload.addEventListener('click', () => { toggleMenu(false);
-                downloadCurrentFile(); });
-
-            // ----- Sidebar collapse -----
-            function applySidebarState(collapsed) {
-                if (collapsed) {
-                    fileTreeEl.classList.add('collapsed');
-                    sidebarToggle.innerHTML = '<i class="fas fa-angle-right"></i>';
-                    fileTreeEl.setAttribute('aria-expanded', 'false');
-                } else {
-                    fileTreeEl.classList.remove('collapsed');
-                    sidebarToggle.innerHTML = '<i class="fas fa-angle-left"></i>';
-                    fileTreeEl.setAttribute('aria-expanded', 'true');
-                }
+                setCookie(COOKIE_KEYS.FILES, filesData);
+                setCookie(COOKIE_KEYS.CURRENT_FILE, currentFileKey);
+                setCookie(COOKIE_KEYS.OPEN_TABS, openTabs);
+                setCookie(COOKIE_KEYS.THEME, isDark ? 'dark' : 'light');
+                setCookie(COOKIE_KEYS.BG_COLOR, customBg);
+                if (bgImageData) setCookie(COOKIE_KEYS.BG_IMAGE, bgImageData);
+                setCookie(COOKIE_KEYS.BG_BLUR, bgBlurInput.value);
+                const collapsed = fileTreeEl.classList.contains('collapsed');
                 setCookie(COOKIE_KEYS.SIDEBAR, collapsed ? 'collapsed' : 'expanded');
             }
-            sidebarToggle.addEventListener('click', () => {
-                const collapsed = fileTreeEl.classList.contains('collapsed');
-                applySidebarState(!collapsed);
-            });
 
-            // ----- File tree & tabs -----
+            function restoreState() {
+                const filesData = getCookie(COOKIE_KEYS.FILES);
+                if (filesData) {
+                    for (const [key, data] of Object.entries(filesData)) {
+                        fileMap.set(key, data);
+                    }
+                }
+                const current = getCookie(COOKIE_KEYS.CURRENT_FILE);
+                if (current) currentFileKey = current;
+                const tabs = getCookie(COOKIE_KEYS.OPEN_TABS);
+                if (tabs && Array.isArray(tabs)) openTabs = tabs;
+                const theme = getCookie(COOKIE_KEYS.THEME);
+                if (theme === 'light') {
+                    isDark = false;
+                    document.getElementById('ide').classList.add('theme-light');
+                    themeToggle.textContent = '亮色';
+                } else {
+                    isDark = true;
+                    document.getElementById('ide').classList.remove('theme-light');
+                    themeToggle.textContent = '暗色';
+                }
+                const bgColor = getCookie(COOKIE_KEYS.BG_COLOR);
+                if (bgColor) {
+                    customBg = bgColor;
+                    bgColorInput.value = bgColor;
+                    applyBg(bgColor);
+                }
+                const bgImageDataRestored = getCookie(COOKIE_KEYS.BG_IMAGE);
+                if (bgImageDataRestored) {
+                    bgImageData = bgImageDataRestored;
+                    bgImage.style.backgroundImage = `url(${bgImageDataRestored})`;
+                    bgImage.style.backgroundSize = 'cover';
+                    bgImage.style.backgroundPosition = 'center';
+                    bgImage.classList.add('loaded');
+                    bgLayer.style.background = 'transparent';
+                }
+                const blur = getCookie(COOKIE_KEYS.BG_BLUR);
+                if (blur) {
+                    bgBlurInput.value = blur;
+                    blurValue.textContent = blur + 'px';
+                    const blurVal = `blur(${blur}px)`;
+                    bgImage.style.backdropFilter = blurVal;
+                    document.querySelectorAll('#file-tree, #editor-tabs, #editor-textarea, #editor-status, #status-bar, #settings-panel, .toast-item')
+                        .forEach(el => { el.style.backdropFilter = blurVal; });
+                }
+                const sidebar = getCookie(COOKIE_KEYS.SIDEBAR);
+                if (sidebar === 'collapsed') applySidebarState(true);
+                else applySidebarState(false);
+                const githubUser = getCookie(COOKIE_KEYS.GITHUB_USER);
+                const githubToken = getCookie(COOKIE_KEYS.GITHUB_TOKEN);
+                if (githubUser && githubToken) setLoggedIn(githubUser, githubToken);
+                const vscodeSettings = getCookie(COOKIE_KEYS.VSCODE_SETTINGS);
+                if (vscodeSettings) applyVSCodeSettings(vscodeSettings);
+            }
+
+            function getFileExtension(filename) {
+                const i = filename.lastIndexOf('.');
+                return i > 0 ? filename.substring(i + 1).toLowerCase() : '';
+            }
+
+            function getLangFromExt(ext) {
+                const map = { 'js': 'JavaScript', 'ts': 'TypeScript', 'py': 'Python', 'java': 'Java', 'c': 'C',
+                    'cpp': 'C++', 'go': 'Go', 'rb': 'Ruby', 'php': 'PHP', 'swift': 'Swift', 'html': 'HTML',
+                    'css': 'CSS', 'json': 'JSON', 'xml': 'XML', 'yaml': 'YAML', 'toml': 'TOML', 'md': 'Markdown',
+                    'txt': '文本', 'sh': 'Shell', 'rs': 'Rust', 'kt': 'Kotlin', 'dart': 'Dart', 'lua': 'Lua',
+                    'r': 'R', 'sql': 'SQL'
+                };
+                return map[ext] || '文本';
+            }
+
+            function getIconFromExt(ext) {
+                const map = { 'js': 'fab fa-js-square', 'ts': 'fab fa-js-square', 'html': 'fab fa-html5',
+                    'css': 'fab fa-css3-alt', 'json': 'fas fa-cog', 'md': 'fas fa-file-alt', 'py': 'fab fa-python',
+                    'java': 'fab fa-java', 'go': 'fas fa-code', 'rb': 'fas fa-gem', 'php': 'fab fa-php',
+                    'swift': 'fab fa-swift', 'rs': 'fas fa-cog', 'kt': 'fas fa-code', 'dart': 'fas fa-code',
+                    'lua': 'fas fa-code', 'sh': 'fas fa-terminal', 'xml': 'fas fa-code', 'yaml': 'fas fa-code',
+                    'toml': 'fas fa-code', 'sql': 'fas fa-database', 'txt': 'fas fa-file-alt'
+                };
+                return map[ext] || 'fas fa-file';
+            }
+
+            function generateKey(path) {
+                return path.replace(/[^a-zA-Z0-9]/g, '_');
+            }
+
             function renderFileTree() {
                 const title = fileTreeEl.querySelector('.tree-title');
                 fileTreeEl.innerHTML = '';
@@ -969,76 +1017,6 @@
                 cursorPos.textContent = `行 ${row}, 列 ${col}`;
             }
 
-            // ----- Helpers -----
-            function getFileExtension(filename) {
-                const i = filename.lastIndexOf('.');
-                return i > 0 ? filename.substring(i + 1).toLowerCase() : '';
-            }
-
-            function getLangFromExt(ext) {
-                const map = {
-                    'js': 'JavaScript',
-                    'ts': 'TypeScript',
-                    'py': 'Python',
-                    'java': 'Java',
-                    'c': 'C',
-                    'cpp': 'C++',
-                    'go': 'Go',
-                    'rb': 'Ruby',
-                    'php': 'PHP',
-                    'swift': 'Swift',
-                    'html': 'HTML',
-                    'css': 'CSS',
-                    'json': 'JSON',
-                    'xml': 'XML',
-                    'yaml': 'YAML',
-                    'toml': 'TOML',
-                    'md': 'Markdown',
-                    'txt': '文本',
-                    'sh': 'Shell',
-                    'rs': 'Rust',
-                    'kt': 'Kotlin',
-                    'dart': 'Dart',
-                    'lua': 'Lua',
-                    'r': 'R',
-                    'sql': 'SQL'
-                };
-                return map[ext] || '文本';
-            }
-
-            function getIconFromExt(ext) {
-                const map = {
-                    'js': 'fab fa-js-square',
-                    'ts': 'fab fa-js-square',
-                    'html': 'fab fa-html5',
-                    'css': 'fab fa-css3-alt',
-                    'json': 'fas fa-cog',
-                    'md': 'fas fa-file-alt',
-                    'py': 'fab fa-python',
-                    'java': 'fab fa-java',
-                    'go': 'fas fa-code',
-                    'rb': 'fas fa-gem',
-                    'php': 'fab fa-php',
-                    'swift': 'fab fa-swift',
-                    'rs': 'fas fa-cog',
-                    'kt': 'fas fa-code',
-                    'dart': 'fas fa-code',
-                    'lua': 'fas fa-code',
-                    'sh': 'fas fa-terminal',
-                    'xml': 'fas fa-code',
-                    'yaml': 'fas fa-code',
-                    'toml': 'fas fa-code',
-                    'sql': 'fas fa-database',
-                    'txt': 'fas fa-file-alt'
-                };
-                return map[ext] || 'fas fa-file';
-            }
-
-            function generateKey(path) {
-                return path.replace(/[^a-zA-Z0-9]/g, '_');
-            }
-
-            // Editor events
             editor.addEventListener('input', function() {
                 if (currentFileKey) {
                     const file = fileMap.get(currentFileKey);
@@ -1050,7 +1028,6 @@
             editor.addEventListener('click', updateCursor);
             editor.addEventListener('keyup', updateCursor);
 
-            // File open
             hiddenFolderInput.addEventListener('change', function() {
                 if (this.files.length > 0) loadFilesFromList(this.files);
                 this.value = '';
@@ -1060,17 +1037,13 @@
                 this.value = '';
             });
 
-            // ----- Download current file -----
             function downloadCurrentFile() {
                 if (!currentFileKey) {
                     showToast('没有打开的文件', true);
                     return;
                 }
                 const file = fileMap.get(currentFileKey);
-                if (!file) {
-                    showToast('文件内容不存在', true);
-                    return;
-                }
+                if (!file) { showToast('文件内容不存在', true); return; }
                 try {
                     const content = file.content || '';
                     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
@@ -1088,14 +1061,98 @@
                 }
             }
 
-            // ----- Settings -----
+            function positionFileMenu() {
+                const btnRect = fileMenuBtn.getBoundingClientRect();
+                const menuRect = fileMenu.getBoundingClientRect();
+                const spacing = 6;
+                let left = Math.round(btnRect.left);
+                if (left + menuRect.width > window.innerWidth - 10) {
+                    left = Math.max(10, window.innerWidth - menuRect.width - 10);
+                }
+                let top = Math.round(btnRect.bottom + spacing);
+                if (top + menuRect.height > window.innerHeight - 10) {
+                    top = Math.max(10, btnRect.top - menuRect.height - spacing);
+                }
+                fileMenu.style.left = left + 'px';
+                fileMenu.style.top = top + 'px';
+            }
+
+            function openFileMenu() {
+                menuOpen = true;
+                fileMenu.classList.add('open');
+                fileMenu.setAttribute('aria-hidden', 'false');
+                fileMenuBtn.setAttribute('aria-expanded', 'true');
+                positionFileMenu();
+                setTimeout(() => {
+                    window.addEventListener('resize', onWindowHideMenu);
+                    window.addEventListener('scroll', onWindowHideMenu, true);
+                    document.addEventListener('keydown', onEscapeHideMenu);
+                }, 0);
+            }
+
+            function closeFileMenu() {
+                menuOpen = false;
+                fileMenu.classList.remove('open');
+                fileMenu.setAttribute('aria-hidden', 'true');
+                fileMenuBtn.setAttribute('aria-expanded', 'false');
+                window.removeEventListener('resize', onWindowHideMenu);
+                window.removeEventListener('scroll', onWindowHideMenu, true);
+                document.removeEventListener('keydown', onEscapeHideMenu);
+            }
+
+            function toggleMenu(open) {
+                const should = (open !== undefined) ? !!open : !menuOpen;
+                if (should) openFileMenu();
+                else closeFileMenu();
+            }
+
+            function onWindowHideMenu() { closeFileMenu(); }
+
+            function onEscapeHideMenu(e) { if (e.key === 'Escape') closeFileMenu(); }
+
+            fileMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleMenu();
+            });
+
+            document.addEventListener('click', (e) => {
+                if (menuOpen && !fileMenu.contains(e.target) && e.target !== fileMenuBtn) {
+                    toggleMenu(false);
+                }
+            });
+
+            fileMenu.style.backdropFilter = 'none';
+
+            menuOpenFolder.addEventListener('click', () => { toggleMenu(false);
+                hiddenFolderInput.click(); });
+            menuOpenFile.addEventListener('click', () => { toggleMenu(false);
+                hiddenFileInput.click(); });
+            menuDownload.addEventListener('click', () => { toggleMenu(false);
+                downloadCurrentFile(); });
+
+            function applySidebarState(collapsed) {
+                if (collapsed) {
+                    fileTreeEl.classList.add('collapsed');
+                    sidebarToggle.innerHTML = '<i class="fas fa-angle-right"></i>';
+                    fileTreeEl.setAttribute('aria-expanded', 'false');
+                } else {
+                    fileTreeEl.classList.remove('collapsed');
+                    sidebarToggle.innerHTML = '<i class="fas fa-angle-left"></i>';
+                    fileTreeEl.setAttribute('aria-expanded', 'true');
+                }
+                setCookie(COOKIE_KEYS.SIDEBAR, collapsed ? 'collapsed' : 'expanded');
+            }
+            sidebarToggle.addEventListener('click', () => {
+                const collapsed = fileTreeEl.classList.contains('collapsed');
+                applySidebarState(!collapsed);
+            });
+
             settingsBtn.addEventListener('click', () => settingsOverlay.classList.add('open'));
             settingsClose.addEventListener('click', () => settingsOverlay.classList.remove('open'));
             settingsOverlay.addEventListener('click', (e) => {
                 if (e.target === settingsOverlay) settingsOverlay.classList.remove('open');
             });
 
-            // Theme toggle
             themeToggle.addEventListener('click', function() {
                 isDark = !isDark;
                 document.getElementById('ide').classList.toggle('theme-light', !isDark);
@@ -1110,7 +1167,6 @@
                 saveState();
             });
 
-            // Background color
             bgColorInput.addEventListener('input', function() {
                 applyBg(this.value);
                 customBg = this.value;
@@ -1124,7 +1180,6 @@
                 }
             }
 
-            // Background image upload
             bgUploadBtn.addEventListener('click', () => hiddenBgInput.click());
             hiddenBgInput.addEventListener('change', function(e) {
                 const file = this.files[0];
@@ -1145,7 +1200,6 @@
                 this.value = '';
             });
 
-            // Background blur
             bgBlurInput.addEventListener('input', function() {
                 const val = this.value;
                 blurValue.textContent = val + 'px';
@@ -1159,157 +1213,8 @@
                 saveState();
             });
 
-            // Import VSCode settings from settings panel
             const importVscodeBtn = document.getElementById('import-vscode-btn');
             importVscodeBtn.addEventListener('click', () => hiddenVscodeInput.click());
-
-            // ----- GitHub OAuth (PKCE) -----
-            function generateRandomString(length) {
-                const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
-                let result = '';
-                for (let i = 0; i < length; i++) result += possible.charAt(Math.floor(Math.random() * possible.length));
-                return result;
-            }
-
-            async function sha256(plain) {
-                const encoder = new TextEncoder();
-                const data = encoder.encode(plain);
-                const hash = await crypto.subtle.digest('SHA-256', data);
-                return hash;
-            }
-
-            function base64url(buffer) {
-                const bytes = new Uint8Array(buffer);
-                let binary = '';
-                for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-                return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-            }
-
-            async function startGitHubOAuth(fromOOBE = false) {
-                if (!isStorageAvailable()) {
-                    showToast('存储不可用，请使用非沙盒环境打开', true);
-                    return;
-                }
-                try {
-                    const verifier = generateRandomString(64);
-                    const state = generateRandomString(32);
-                    sessionStorage.setItem('oauth_verifier', verifier);
-                    sessionStorage.setItem('oauth_state', state);
-                    const hash = await sha256(verifier);
-                    const challenge = base64url(hash);
-                    const params = new URLSearchParams({
-                        client_id: GITHUB_CLIENT_ID,
-                        redirect_uri: REDIRECT_URI,
-                        response_type: 'code',
-                        scope: SCOPE,
-                        state: state,
-                        code_challenge: challenge,
-                        code_challenge_method: 'S256'
-                    });
-                    if (fromOOBE) {
-                        sessionStorage.setItem('oobe_pending', 'true');
-                    }
-                    window.location.href = `https://github.com/login/oauth/authorize?${params.toString()}`;
-                } catch (err) {
-                    showToast('OAuth 启动失败: ' + err.message, true);
-                }
-            }
-
-            async function handleOAuthCallback() {
-                if (!isStorageAvailable()) {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    if (urlParams.get('code')) {
-                        showToast('存储不可用，无法完成回调', true);
-                        if (window.history && window.history.replaceState) {
-                            window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
-                        }
-                    }
-                    return false;
-                }
-                const urlParams = new URLSearchParams(window.location.search);
-                const code = urlParams.get('code');
-                const state = urlParams.get('state');
-                if (!code || !state) return false;
-                try {
-                    const savedState = sessionStorage.getItem('oauth_state');
-                    if (state !== savedState) { showToast('State 校验失败', true); return false; }
-                    const verifier = sessionStorage.getItem('oauth_verifier');
-                    if (!verifier) { showToast('未找到 verifier', true); return false; }
-                    sessionStorage.removeItem('oauth_state');
-                    sessionStorage.removeItem('oauth_verifier');
-                    const resp = await fetch('https://github.com/login/oauth/access_token', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                        body: JSON.stringify({
-                            client_id: GITHUB_CLIENT_ID,
-                            code: code,
-                            redirect_uri: REDIRECT_URI,
-                            code_verifier: verifier
-                        })
-                    });
-                    const data = await resp.json();
-                    if (data.error) { showToast('Token 交换失败: ' + data.error_description, true); return false; }
-                    const accessToken = data.access_token;
-                    if (!accessToken) { showToast('未获得 access_token', true); return false; }
-                    const userResp = await fetch('https://api.github.com/user', {
-                        headers: { 'Authorization': `token ${accessToken}`, 'Accept': 'application/json' }
-                    });
-                    if (!userResp.ok) { showToast('获取用户信息失败', true); return false; }
-                    const user = await userResp.json();
-                    const login = user.login || '用户';
-                    setLoggedIn(login, accessToken);
-
-                    const fromOOBE = sessionStorage.getItem('oobe_pending');
-                    if (fromOOBE) {
-                        sessionStorage.removeItem('oobe_pending');
-                        oobeGithubDone = true;
-                        oobeGithubStatus.textContent = `已登录: ${login}`;
-                        oobeGithubStatus.className = 'status done';
-                    }
-
-                    showToast(`已登录为 ${login}`);
-                    if (window.history && window.history.replaceState) {
-                        window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
-                    }
-                    return true;
-                } catch (err) {
-                    showToast('OAuth 回调处理失败: ' + err.message, true);
-                    return false;
-                }
-            }
-
-            let loggedIn = false;
-
-            function setLoggedIn(user, accessToken) {
-                loggedIn = true;
-                githubUserLabel.textContent = user;
-                githubStatus.innerHTML =
-                    `<i class="fab fa-github"></i> ${user} <i class="fas fa-check-circle" style="color:#6aba6a;margin-left:4px;"></i>`;
-                githubStatus.classList.add('logged-in');
-                document.getElementById('ide').classList.add('logged-in');
-                githubLoginBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> 登出`;
-                statusGit.innerHTML = `<i class="fas fa-github"></i> ${user}`;
-                setCookie(COOKIE_KEYS.GITHUB_USER, user);
-                setCookie(COOKIE_KEYS.GITHUB_TOKEN, accessToken);
-            }
-
-            function logout() {
-                loggedIn = false;
-                githubUserLabel.textContent = '';
-                githubStatus.innerHTML = `<i class="fab fa-github"></i>`;
-                githubStatus.classList.remove('logged-in');
-                document.getElementById('ide').classList.remove('logged-in');
-                githubLoginBtn.innerHTML = `<i class="fab fa-github"></i> 登录`;
-                statusGit.innerHTML = `<i class="fas fa-github"></i> 未连接`;
-                removeCookie(COOKIE_KEYS.GITHUB_USER);
-                removeCookie(COOKIE_KEYS.GITHUB_TOKEN);
-                showToast('已登出');
-            }
-
-            githubLoginBtn.addEventListener('click', function() {
-                if (loggedIn) logout();
-                else startGitHubOAuth(false);
-            });
 
             // ----- Init -----
             async function init() {
@@ -1317,9 +1222,7 @@
                 await handleOAuthCallback();
 
                 if (fileMap.size === 0) {
-                    const sampleContent = `// IDEata
-// 点击「文件」→ 打开文件夹 或 打开文件
-// 设置中可调整主题、背景等`;
+                    const sampleContent = `// IDEata\n// 点击「文件」→ 打开文件夹 或 打开文件\n// 设置中可调整主题、背景等`;
                     const key = addFile('README.md', sampleContent);
                     openTabs.push(key);
                 }
