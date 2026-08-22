@@ -16,50 +16,44 @@
         @keyframes pulseGlow { 0% { opacity: 0.2; transform: scale(0.9); } 100% { opacity: 0; transform: scale(1.5); } }
 
         #bg-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: #0e0e0e; transition: background 0.4s ease; }
-        #bg-image { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-size: cover; background-position: center; opacity: 0; transition: opacity 0.6s ease; }
+        #bg-image { position: fixed; inset: 0; z-index: 1; pointer-events: none; background-size: cover; background-position: center; opacity: 0; transition: opacity 0.6s ease; }
         #bg-image.loaded { opacity: 1; }
 
-        #topbar { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; background: #1e1e1e; border-bottom: 1px solid #2d2d2d; flex-shrink: 0; min-height: 40px; height: 40px; position: relative; z-index: 2; }
+        #topbar { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; background: rgba(30,30,30,0.92); backdrop-filter: blur(4px); border-bottom: 1px solid rgba(45,45,45,0.5); flex-shrink: 0; min-height: 40px; height: 40px; position: relative; z-index: 3; }
         #brand { display: flex; align-items: center; gap: 10px; }
         #brand i { font-size: 1.3rem; color: #b0b0c0; }
-        #brand h1 { font-weight: 400; font-size: 1.1rem; letter-spacing: 0.5px; color: #ccccdc; }
-        #topbar-actions { display: flex; align-items: center; gap: 12px; position: relative; }
+        .file-main-btn { background: transparent; border: none; color: #ccccdc; font-size: 0.85rem; padding: 4px 12px; cursor: pointer; transition: 0.15s; display: flex; align-items: center; gap: 6px; font-family: inherit; }
+        .file-main-btn:hover { background: rgba(255,255,255,0.08); color: #f0f0ff; border-radius: 4px; }
+        .file-main-btn i { font-size: 0.9rem; }
 
+        #topbar-actions { display: flex; align-items: center; gap: 12px; }
         .topbar-btn { background: transparent; border: none; color: #ccccdc; font-size: 0.8rem; padding: 4px 14px; cursor: pointer; transition: 0.15s; display: flex; align-items: center; gap: 6px; font-family: inherit; }
-        .topbar-btn:hover { background: rgba(255,255,255,0.06); color: #f0f0ff; }
+        .topbar-btn:hover { background: rgba(255,255,255,0.08); color: #f0f0ff; border-radius: 4px; }
         .topbar-btn i { font-size: 0.9rem; }
 
-        /* 文件菜单：使用 fixed 定位并动态设置 top/left */
         #file-menu { position: fixed; top: 0; left: 0; margin-top: 6px; background: #1e1e2e; border-radius: 8px; padding: 6px 0; min-width: 180px; box-shadow: 0 12px 36px rgba(0,0,0,0.7); opacity: 0; transform: translateY(-6px) scale(0.98); pointer-events: none; transition: opacity 0.18s ease, transform 0.18s ease; z-index: 10010; backdrop-filter: none; }
         #file-menu.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
         .file-menu-item { display: flex; align-items: center; gap: 10px; padding: 8px 18px; background: transparent; border: none; color: #c0c0d0; font-size: 0.9rem; cursor: pointer; width: 100%; text-align: left; font-family: inherit; transition: 0.1s; }
         .file-menu-item:hover { background: #2d2d3a; color: #f0f0ff; }
         .file-menu-item i { width: 18px; color: #7a7a9a; }
 
-        #main-panel { display: flex; flex: 1; overflow: hidden; background: transparent; position: relative; z-index: 1; }
-
-        /* 侧边栏：支持折叠 */
-        #file-tree {
-            width: 220px; min-width: 56px; background: rgba(30,30,30,0.85); backdrop-filter: blur(4px); padding: 8px 0 16px 0; overflow-y: auto; flex-shrink: 0; border-right: 1px solid rgba(45,45,45,0.5);
-            transition: width 0.22s ease, background 0.3s ease, backdrop-filter 0.3s ease;
-        }
+        #main-panel { display: flex; flex: 1; overflow: hidden; background: transparent; position: relative; z-index: 2; }
+        #file-tree { width: 220px; min-width: 56px; background: rgba(30,30,30,0.85); backdrop-filter: blur(4px); padding: 8px 0 16px 0; overflow-y: auto; flex-shrink: 0; border-right: 1px solid rgba(45,45,45,0.5); transition: width 0.22s ease, background 0.3s ease, backdrop-filter 0.3s ease; position: relative; z-index: 2; }
         #file-tree.collapsed { width: 56px; }
         #file-tree::-webkit-scrollbar { width: 4px; background: transparent; }
         #file-tree::-webkit-scrollbar-thumb { background: #3a3a4a; border-radius: 10px; }
         .tree-title { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; color: #6a6a7a; padding: 8px 16px 4px 16px; font-weight: 600; display:flex; align-items:center; justify-content:space-between; gap:8px; }
         .collapse-btn { background: transparent; border: none; color: #9a9aa8; cursor: pointer; padding: 6px; border-radius: 6px; transition: background 0.12s; }
-        .collapse-btn:hover { background: rgba(255,255,255,0.03); }
-
+        .collapse-btn:hover { background: rgba(255,255,255,0.05); }
         .file-item { display: flex; align-items: center; gap: 8px; padding: 6px 16px 6px 20px; margin: 1px 0; color: #b0b0c0; font-size: 0.8rem; transition: 0.08s; cursor: pointer; background: transparent; border: none; width: 100%; text-align: left; border-left: 2px solid transparent; font-family: 'Segoe UI', 'Fira Code', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         #file-tree.collapsed .file-item { justify-content: center; padding: 6px 8px; }
         .file-item i { width: 18px; color: #6a6a8a; font-size: 0.9rem; text-align: center; }
         .file-item .file-name { transition: opacity 0.16s; }
         #file-tree.collapsed .file-name { opacity: 0; width: 0; height: 0; pointer-events: none; display: inline-block; }
-
         .file-item:hover { background: rgba(42,42,42,0.6); color: #e8e8f0; }
         .file-item.active { background: rgba(45,45,58,0.7); color: #f0f0ff; border-left: 2px solid #0078d4; }
 
-        #editor-container { flex: 1; display: flex; flex-direction: column; background: transparent; overflow: hidden; }
+        #editor-container { flex: 1; display: flex; flex-direction: column; background: transparent; overflow: hidden; position: relative; z-index: 2; }
         #editor-tabs { display: flex; align-items: center; background: rgba(30,30,30,0.7); backdrop-filter: blur(4px); padding: 0 12px; min-height: 36px; border-bottom: 1px solid rgba(45,45,45,0.5); gap: 2px; flex-wrap: nowrap; overflow-x: auto; transition: background 0.3s ease, backdrop-filter 0.3s ease; }
         #editor-tabs::-webkit-scrollbar { height: 2px; background: transparent; }
         #editor-tabs::-webkit-scrollbar-thumb { background: #3a3a4a; border-radius: 10px; }
@@ -76,7 +70,7 @@
         #editor-textarea:focus { background: rgba(17,17,17,0.7); box-shadow: inset 0 0 0 1px rgba(42,42,58,0.5); }
 
         #editor-status { display: flex; justify-content: flex-end; padding: 2px 20px; background: rgba(30,30,30,0.6); backdrop-filter: blur(4px); border-top: 1px solid rgba(45,45,45,0.5); font-size: 0.6rem; color: #6a6a7a; gap: 16px; min-height: 24px; transition: background 0.3s ease; }
-        #status-bar { display: flex; justify-content: space-between; padding: 2px 16px; background: rgba(30,30,30,0.7); backdrop-filter: blur(4px); border-top: 1px solid rgba(45,45,45,0.5); font-size: 0.6rem; color: #7a7a8a; flex-shrink: 0; min-height: 26px; align-items: center; position: relative; z-index: 1; transition: background 0.3s ease; }
+        #status-bar { display: flex; justify-content: space-between; padding: 2px 16px; background: rgba(30,30,30,0.7); backdrop-filter: blur(4px); border-top: 1px solid rgba(45,45,45,0.5); font-size: 0.6rem; color: #7a7a8a; flex-shrink: 0; min-height: 26px; align-items: center; position: relative; z-index: 2; transition: background 0.3s ease; }
         #status-bar .status-group { display: flex; gap: 16px; align-items: center; }
         #status-bar i { margin-right: 4px; font-size: 0.6rem; color: #5a5a6a; }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -97,20 +91,108 @@
         #settings-panel { background: rgba(30,30,46,0.92); backdrop-filter: blur(12px); border: 1px solid #3a3a4a; border-radius: 12px; padding: 28px 32px; min-width: 320px; max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.9); transition: transform 0.3s ease, opacity 0.3s ease; transform: scale(0.95); opacity: 0; }
         #settings-overlay.open #settings-panel { transform: scale(1); opacity: 1; }
         #settings-panel h2 { font-size: 1rem; font-weight: 400; color: #d0d0e0; margin-bottom: 20px; letter-spacing: 0.5px; }
+        .setting-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(45,45,58,0.5); }
+        .setting-row:last-child { border-bottom: none; }
+        .setting-row label { font-size: 0.85rem; color: #b0b0c0; }
+        .setting-row input[type="color"] { width: 36px; height: 36px; border: none; border-radius: 6px; background: transparent; cursor: pointer; padding: 0; }
+        .setting-row input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        .setting-row input[type="color"]::-webkit-color-swatch { border: 1px solid #3a3a4a; border-radius: 6px; }
+        .setting-row input[type="range"] { width: 120px; accent-color: #6a6a8a; background: transparent; cursor: pointer; }
+        .setting-row .file-upload-btn { background: #2d2d3a; border: none; color: #b0b0c0; padding: 4px 14px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; font-family: inherit; transition: 0.15s; }
+        .setting-row .file-upload-btn:hover { background: #3a3a4a; color: #f0f0ff; }
+        .toggle-btn { background: #2d2d3a; border: none; color: #b0b0c0; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; transition: 0.15s; font-family: inherit; }
+        .toggle-btn:hover { background: #3a3a4a; color: #f0f0ff; }
+        .toggle-btn.active { background: #3a6a5a; color: #e0f0e8; }
+        #settings-close { margin-top: 16px; width: 100%; padding: 8px; background: #2d2d3a; border: none; border-radius: 8px; color: #c0c0d0; cursor: pointer; font-size: 0.8rem; font-family: inherit; transition: 0.15s; }
+        #settings-close:hover { background: #3a3a4a; color: #f0f0ff; }
 
         #hidden-file-input, #hidden-single-file-input, #hidden-bg-input { display: none; }
-
-        /* GitHub 状态 - 已登录时显示用户名 */
         #github-login-status { display: flex; align-items: center; gap: 6px; background: #252525; padding: 4px 14px 4px 10px; border-radius: 20px; font-size: 0.75rem; color: #b0b0b0; border: 1px solid #333; transition: 0.2s; cursor: default; }
         #github-login-status i { font-size: 0.9rem; }
         .logged-in #github-login-status { border-color: #2a5a3a; color: #b0d0b0; }
         .logged-in #github-login-status i.fa-check-circle { color: #6aba6a; }
         #github-login-status:not(.logged-in) { display: none; }
 
-        /* 亮色主题 */
+        /* OOBE 设置向导 - Apple质感 */
+        #oobe-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 10050; display: none; align-items: center; justify-content: center; animation: oobeFadeIn 0.6s cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards; }
+        #oobe-overlay.open { display: flex; }
+        @keyframes oobeFadeIn { 0% { opacity: 0; transform: scale(1.02); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes oobeFadeOut { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0.98); } }
+        #oobe-overlay.closing { animation: oobeFadeOut 0.3s cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards; }
+        #oobe-panel { background: rgba(38,38,46,0.85); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-radius: 28px; padding: 44px 48px; max-width: 540px; width: 90%; box-shadow: 0 40px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.04); transition: all 0.4s ease; }
+        #oobe-panel .oobe-icon { text-align: center; font-size: 3.2rem; margin-bottom: 16px; background: linear-gradient(135deg, #6a6a8a, #8a8aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        #oobe-panel h2 { font-size: 1.5rem; font-weight: 500; color: #ececf0; text-align: center; margin-bottom: 6px; letter-spacing: -0.3px; }
+        #oobe-panel .subtitle { text-align: center; color: #9a9aaa; font-size: 0.9rem; margin-bottom: 28px; font-weight: 300; }
+        .oobe-option { display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: rgba(255,255,255,0.04); border-radius: 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.25s ease; border: 1px solid rgba(255,255,255,0.04); }
+        .oobe-option:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.08); transform: scale(1.01); }
+        .oobe-option .icon { font-size: 1.4rem; width: 40px; text-align: center; color: #7a7a9a; }
+        .oobe-option .info { flex: 1; }
+        .oobe-option .info .title { font-size: 0.9rem; color: #e0e0e8; font-weight: 400; }
+        .oobe-option .info .desc { font-size: 0.75rem; color: #7a7a8a; margin-top: 2px; }
+        .oobe-option .status { font-size: 0.75rem; color: #6a6a8a; }
+        .oobe-option .status.done { color: #5a9a7a; }
+        .oobe-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); }
+        .oobe-actions button { padding: 10px 32px; border: none; border-radius: 30px; font-size: 0.9rem; font-family: inherit; cursor: pointer; transition: all 0.25s ease; font-weight: 400; }
+        .oobe-actions .btn-primary { background: #3a6a5a; color: #f0f8f4; }
+        .oobe-actions .btn-primary:hover { background: #4a8a7a; transform: scale(1.02); }
+        .oobe-actions .btn-secondary { background: rgba(255,255,255,0.06); color: #b0b0c0; }
+        .oobe-actions .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+        .oobe-actions .btn-primary:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+        .theme-light #oobe-panel { background: rgba(240,240,245,0.92); backdrop-filter: blur(30px); border-color: rgba(0,0,0,0.04); }
+        .theme-light #oobe-panel h2 { color: #222; }
+        .theme-light #oobe-panel .subtitle { color: #666; }
+        .theme-light .oobe-option { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.04); }
+        .theme-light .oobe-option:hover { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.08); }
+        .theme-light .oobe-option .info .title { color: #333; }
+        .theme-light .oobe-option .info .desc { color: #777; }
+        .theme-light .oobe-actions .btn-secondary { background: rgba(0,0,0,0.04); color: #666; }
+        .theme-light .oobe-actions .btn-secondary:hover { background: rgba(0,0,0,0.08); }
+
         .theme-light #bg-layer { background: #f0f0f0; }
-        .theme-light #topbar { background: rgba(232,232,232,0.9); backdrop-filter: blur(4px); border-bottom-color: rgba(204,204,204,0.5); }
-        /* ...（亮色样式保留原样，省略重复行以保持文件紧凑）... */
+        .theme-light #topbar { background: rgba(240,240,240,0.92); backdrop-filter: blur(4px); border-bottom-color: rgba(180,180,180,0.5); }
+        .theme-light #brand i { color: #555; }
+        .theme-light .file-main-btn { color: #444; }
+        .theme-light .file-main-btn:hover { background: rgba(0,0,0,0.06); color: #111; }
+        .theme-light .topbar-btn { color: #444; }
+        .theme-light .topbar-btn:hover { background: rgba(0,0,0,0.06); color: #111; }
+        .theme-light #file-tree { background: rgba(240,240,240,0.88); backdrop-filter: blur(4px); border-right-color: rgba(180,180,180,0.5); }
+        .theme-light .file-item { color: #444; }
+        .theme-light .file-item:hover { background: rgba(200,200,200,0.5); color: #111; }
+        .theme-light .file-item.active { background: rgba(180,180,200,0.6); color: #000; border-left-color: #0078d4; }
+        .theme-light .tree-title { color: #888; }
+        .theme-light .collapse-btn { color: #777; }
+        .theme-light .collapse-btn:hover { background: rgba(0,0,0,0.04); }
+        .theme-light #editor-tabs { background: rgba(240,240,240,0.8); backdrop-filter: blur(4px); border-bottom-color: rgba(180,180,180,0.5); }
+        .theme-light .tab-item { color: #666; }
+        .theme-light .tab-item.active { color: #222; background: rgba(220,220,220,0.6); border-bottom-color: #0078d4; }
+        .theme-light .tab-item:hover { color: #111; background: rgba(200,200,200,0.3); }
+        .theme-light #editor-textarea { background: rgba(245,245,245,0.7); color: #222; }
+        .theme-light #editor-textarea:focus { background: rgba(250,250,250,0.8); box-shadow: inset 0 0 0 1px rgba(150,150,150,0.5); }
+        .theme-light #editor-status { background: rgba(240,240,240,0.7); border-top-color: rgba(180,180,180,0.5); color: #666; }
+        .theme-light #status-bar { background: rgba(240,240,240,0.8); border-top-color: rgba(180,180,180,0.5); color: #666; }
+        .theme-light #file-menu { background: rgba(245,245,245,0.95); box-shadow: 0 8px 30px rgba(0,0,0,0.15); }
+        .theme-light .file-menu-item { color: #444; }
+        .theme-light .file-menu-item:hover { background: rgba(200,200,200,0.5); color: #111; }
+        .theme-light .toast-item { background: rgba(240,240,240,0.95); border-color: #ccc; color: #222; }
+        .theme-light .toast-item.error { border-color: #aa6a6a; }
+        .theme-light #settings-panel { background: rgba(245,245,245,0.95); backdrop-filter: blur(12px); border-color: #ccc; }
+        .theme-light #settings-panel h2 { color: #333; }
+        .theme-light .setting-row { border-bottom-color: rgba(200,200,200,0.5); }
+        .theme-light .setting-row label { color: #444; }
+        .theme-light .toggle-btn { background: rgba(220,220,220,0.8); color: #444; }
+        .theme-light .toggle-btn:hover { background: rgba(200,200,200,0.8); }
+        .theme-light .toggle-btn.active { background: #4a8a7a; color: #f0f0f0; }
+        .theme-light #settings-close { background: rgba(220,220,220,0.8); color: #444; }
+        .theme-light #settings-close:hover { background: rgba(200,200,200,0.8); }
+        .theme-light .setting-row .file-upload-btn { background: rgba(220,220,220,0.8); color: #444; }
+        .theme-light .setting-row .file-upload-btn:hover { background: rgba(200,200,200,0.8); }
+        .theme-light #github-login-status { background: rgba(220,220,220,0.8); border-color: #ccc; color: #555; }
+        .theme-light #github-login-status.logged-in { border-color: #2a5a3a; color: #2a6a3a; }
+        .theme-light #status-github { color: #666; }
+        .theme-light #status-files { color: #666; }
+
+        #hidden-vscode-input { display: none; }
     </style>
 </head>
 <body>
@@ -119,17 +201,53 @@
     <div id="bg-image"></div>
     <div id="toast-container"></div>
 
+    <!-- OOBE 设置向导 - Apple质感 -->
+    <div id="oobe-overlay">
+        <div id="oobe-panel">
+            <div class="oobe-icon"><i class="fas fa-code"></i></div>
+            <h2>欢迎使用 IDEata</h2>
+            <p class="subtitle">完成以下设置以开始您的编码之旅</p>
+
+            <div class="oobe-option" id="oobe-github">
+                <div class="icon"><i class="fab fa-github"></i></div>
+                <div class="info">
+                    <div class="title">GitHub 账号</div>
+                    <div class="desc">登录以同步您的设置和仓库</div>
+                </div>
+                <div class="status" id="oobe-github-status">未登录</div>
+            </div>
+
+            <div class="oobe-option" id="oobe-vscode">
+                <div class="icon"><i class="fas fa-cog"></i></div>
+                <div class="info">
+                    <div class="title">VSCode 设置</div>
+                    <div class="desc">导入您的 settings.json 配置文件</div>
+                </div>
+                <div class="status" id="oobe-vscode-status">未导入</div>
+            </div>
+
+            <div class="oobe-actions">
+                <button class="btn-secondary" id="oobe-skip">跳过设置</button>
+                <button class="btn-primary" id="oobe-continue" disabled>继续</button>
+            </div>
+        </div>
+    </div>
+
     <div id="ide">
         <div id="topbar">
-            <div id="brand"><i class="fas fa-code"></i><h1>IDEata</h1></div>
-            <div id="topbar-actions">
-                <button class="topbar-btn" id="file-menu-btn" aria-haspopup="true" aria-expanded="false"><i class="fas fa-file"></i> <span class="btn-label">文件</span> <i class="fas fa-chevron-down" style="font-size:0.5rem;margin-left:4px;"></i></button>
+            <div id="brand">
+                <i class="fas fa-code"></i>
+                <button class="file-main-btn" id="file-menu-btn" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-file"></i> 文件 <i class="fas fa-chevron-down" style="font-size:0.5rem;margin-left:4px;"></i>
+                </button>
                 <div id="file-menu" role="menu" aria-hidden="true">
                     <button class="file-menu-item" id="menu-open-folder"><i class="fas fa-folder-open"></i> 打开文件夹</button>
                     <button class="file-menu-item" id="menu-open-file"><i class="fas fa-file"></i> 打开文件</button>
                     <button class="file-menu-item" id="menu-download"><i class="fas fa-download"></i> 下载</button>
                 </div>
-                <button class="topbar-btn" id="settings-btn" title="设置"><i class="fas fa-sliders-h"></i></button>
+            </div>
+            <div id="topbar-actions">
+                <button class="topbar-btn" id="settings-btn" title="设置"><i class="fas fa-sliders-h"></i> 设置</button>
                 <div id="github-login-status"><i class="fab fa-github"></i><span id="github-user-label"></span></div>
                 <button class="topbar-btn" id="github-login-btn"><i class="fab fa-github"></i> 登录</button>
             </div>
@@ -144,9 +262,9 @@
             <div id="editor-container">
                 <div id="editor-tabs"></div>
                 <div id="editor-body">
-                    <textarea id="editor-textarea" spellcheck="false">// IDEata
-// 点击顶部「文件」按钮，垂直展开菜单
-// 打开文件夹 / 打开文件 / 下载</textarea>
+                    <textarea id="editor-textarea" spellcheck="false">// 欢迎使用 IDEata
+// 点击「文件」→ 打开文件夹 或 打开文件
+// 设置中可调整主题、背景等</textarea>
                     <div id="editor-status">
                         <span id="cursor-position">行 1, 列 1</span>
                         <span id="file-encoding">UTF-8</span>
@@ -183,18 +301,42 @@
                 <input type="range" id="bg-blur" min="0" max="20" value="4" step="1">
                 <span id="blur-value" style="font-size:0.75rem;color:#7a7a8a;min-width:30px;">4px</span>
             </div>
+            <div class="setting-row">
+                <label>导入 VSCode 设置</label>
+                <button class="file-upload-btn" id="import-vscode-btn">选择 settings.json</button>
+            </div>
             <button id="settings-close">关闭</button>
         </div>
     </div>
 
+    <!-- 隐藏的文件输入 -->
     <input type="file" id="hidden-file-input" multiple webkitdirectory>
     <input type="file" id="hidden-single-file-input" multiple>
+    <input type="file" id="hidden-vscode-input" accept=".json">
 
     <script>
         (function() {
             "use strict";
 
-            // DOM
+            // ----- Cookie 工具函数 -----
+            function setCookie(name, value, days = 365) {
+                const expires = new Date(Date.now() + days * 86400000).toUTCString();
+                document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(JSON.stringify(value))}; expires=${expires}; path=/; SameSite=Lax`;
+            }
+
+            function getCookie(name) {
+                const match = document.cookie.match(new RegExp('(^| )' + encodeURIComponent(name) + '=([^;]+)'));
+                if (match) {
+                    try { return JSON.parse(decodeURIComponent(match[2])); } catch (e) { return null; }
+                }
+                return null;
+            }
+
+            function removeCookie(name) {
+                document.cookie = `${encodeURIComponent(name)}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+            }
+
+            // ----- DOM 引用 -----
             const editor = document.getElementById('editor-textarea');
             const fileTreeEl = document.getElementById('file-tree');
             const editorTabs = document.getElementById('editor-tabs');
@@ -223,8 +365,18 @@
             const bgLayer = document.getElementById('bg-layer');
             const hiddenFolderInput = document.getElementById('hidden-file-input');
             const hiddenFileInput = document.getElementById('hidden-single-file-input');
+            const hiddenVscodeInput = document.getElementById('hidden-vscode-input');
             const toastContainer = document.getElementById('toast-container');
             const sidebarToggle = document.getElementById('sidebar-toggle');
+
+            // OOBE 元素
+            const oobeOverlay = document.getElementById('oobe-overlay');
+            const oobeGithub = document.getElementById('oobe-github');
+            const oobeVscode = document.getElementById('oobe-vscode');
+            const oobeGithubStatus = document.getElementById('oobe-github-status');
+            const oobeVscodeStatus = document.getElementById('oobe-vscode-status');
+            const oobeContinue = document.getElementById('oobe-continue');
+            const oobeSkip = document.getElementById('oobe-skip');
 
             // State
             const fileMap = new Map();
@@ -234,51 +386,269 @@
             let customBg = '#0e0e0e';
             let menuOpen = false;
             let bgImageData = null;
+            let oobeGithubDone = false;
+            let oobeVscodeDone = false;
 
-            // Persisted states
-            const SIDEBAR_KEY = 'ideata_sidebar_collapsed';
+            const COOKIE_KEYS = {
+                THEME: 'ideata_theme',
+                BG_COLOR: 'ideata_bg_color',
+                BG_IMAGE: 'ideata_bg_image',
+                BG_BLUR: 'ideata_bg_blur',
+                FILES: 'ideata_files',
+                CURRENT_FILE: 'ideata_current_file',
+                OPEN_TABS: 'ideata_open_tabs',
+                SIDEBAR: 'ideata_sidebar',
+                GITHUB_USER: 'ideata_github_user',
+                GITHUB_TOKEN: 'ideata_github_token',
+                VSCODE_SETTINGS: 'ideata_vscode_settings',
+                OOBE_COMPLETE: 'ideata_oobe_complete'
+            };
 
             // GitHub OAuth
             const GITHUB_CLIENT_ID = 'Ov23lirs6asQ9VFE6ywc';
             const REDIRECT_URI = window.location.origin + window.location.pathname;
             const SCOPE = 'read:user';
 
-            // ----- Helpers -----
-            function getFileExtension(filename) {
-                const i = filename.lastIndexOf('.');
-                return i > 0 ? filename.substring(i + 1).toLowerCase() : '';
+            // ----- OOBE 控制 -----
+            function showOOBE() {
+                oobeOverlay.classList.remove('closing');
+                oobeOverlay.classList.add('open');
             }
-            function getLangFromExt(ext) {
-                const map = {
-                    'js':'JavaScript','ts':'TypeScript','py':'Python',
-                    'java':'Java','c':'C','cpp':'C++','go':'Go',
-                    'rb':'Ruby','php':'PHP','swift':'Swift',
-                    'html':'HTML','css':'CSS','json':'JSON',
-                    'xml':'XML','yaml':'YAML','toml':'TOML',
-                    'md':'Markdown','txt':'文本','sh':'Shell',
-                    'rs':'Rust','kt':'Kotlin','dart':'Dart',
-                    'lua':'Lua','r':'R','sql':'SQL'
-                };
-                return map[ext] || '文本';
+
+            function hideOOBE() {
+                oobeOverlay.classList.add('closing');
+                setTimeout(() => {
+                    oobeOverlay.classList.remove('open', 'closing');
+                }, 300);
             }
-            function getIconFromExt(ext) {
-                const map = {
-                    'js':'fab fa-js-square','ts':'fab fa-js-square',
-                    'html':'fab fa-html5','css':'fab fa-css3-alt',
-                    'json':'fas fa-cog','md':'fas fa-file-alt',
-                    'py':'fab fa-python','java':'fab fa-java',
-                    'go':'fas fa-code','rb':'fas fa-gem',
-                    'php':'fab fa-php','swift':'fab fa-swift',
-                    'rs':'fas fa-cog','kt':'fas fa-code',
-                    'dart':'fas fa-code','lua':'fas fa-code',
-                    'sh':'fas fa-terminal','xml':'fas fa-code',
-                    'yaml':'fas fa-code','toml':'fas fa-code',
-                    'sql':'fas fa-database','txt':'fas fa-file-alt'
-                };
-                return map[ext] || 'fas fa-file';
+
+            function checkOOBEStatus() {
+                // 检查URL hash是否包含 #OOBE
+                if (window.location.hash === '#OOBE') {
+                    showOOBE();
+                    return;
+                }
+
+                const completed = getCookie(COOKIE_KEYS.OOBE_COMPLETE);
+                if (!completed) {
+                    setTimeout(() => {
+                        showOOBE();
+                    }, 800);
+                }
             }
-            function generateKey(path) {
-                return path.replace(/[^a-zA-Z0-9]/g, '_');
+
+            function updateOOBEButton() {
+                if (oobeGithubDone || oobeVscodeDone) {
+                    oobeContinue.disabled = false;
+                } else {
+                    oobeContinue.disabled = true;
+                }
+            }
+
+            // 监听hash变化
+            window.addEventListener('hashchange', function() {
+                if (window.location.hash === '#OOBE') {
+                    // 如果已经完成OOBE，重新打开
+                    showOOBE();
+                } else {
+                    // 如果OOBE是打开的且hash被移除，关闭它
+                    if (oobeOverlay.classList.contains('open')) {
+                        hideOOBE();
+                    }
+                }
+            });
+
+            // GitHub OOBE 点击
+            oobeGithub.addEventListener('click', function() {
+                startGitHubOAuth(true);
+            });
+
+            // VSCode OOBE 点击
+            oobeVscode.addEventListener('click', function() {
+                hiddenVscodeInput.click();
+            });
+
+            // 处理VSCode文件选择（OOBE）
+            hiddenVscodeInput.addEventListener('change', function(e) {
+                if (this.files.length > 0) {
+                    const file = this.files[0];
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        try {
+                            const settings = JSON.parse(ev.target.result);
+                            setCookie(COOKIE_KEYS.VSCODE_SETTINGS, settings);
+                            applyVSCodeSettings(settings);
+                            oobeVscodeDone = true;
+                            oobeVscodeStatus.textContent = '已导入 ✓';
+                            oobeVscodeStatus.className = 'status done';
+                            updateOOBEButton();
+                            showToast('VSCode 设置导入成功');
+                        } catch (err) {
+                            showToast('解析 settings.json 失败: ' + err.message, true);
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+                this.value = '';
+            });
+
+            // OOBE 跳过
+            oobeSkip.addEventListener('click', function() {
+                completeOOBE();
+            });
+
+            // OOBE 继续
+            oobeContinue.addEventListener('click', function() {
+                completeOOBE();
+            });
+
+            function completeOOBE() {
+                hideOOBE();
+                setCookie(COOKIE_KEYS.OOBE_COMPLETE, true);
+                // 清除URL中的#OOBE
+                if (window.location.hash === '#OOBE') {
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+                // 如果既没登录也没导入设置，添加默认示例文件
+                if (fileMap.size === 0) {
+                    const sampleContent = `// IDEata
+// 点击「文件」→ 打开文件夹 或 打开文件
+// 设置中可调整主题、背景等`;
+                    const key = addFile('README.md', sampleContent);
+                    openTabs.push(key);
+                    renderFileTree();
+                    loadFile(key);
+                    updateStatusFiles();
+                }
+                showToast('设置完成，欢迎使用 IDEata');
+            }
+
+            // ----- 应用 VSCode 设置 -----
+            function applyVSCodeSettings(settings) {
+                try {
+                    if (settings['editor.fontSize']) {
+                        editor.style.fontSize = settings['editor.fontSize'] + 'px';
+                    }
+                    if (settings['editor.fontFamily']) {
+                        editor.style.fontFamily = settings['editor.fontFamily'];
+                    }
+                    if (settings['editor.tabSize']) {
+                        editor.style.tabSize = settings['editor.tabSize'];
+                    }
+                    if (settings['editor.insertSpaces'] === false) {
+                        editor.addEventListener('keydown', function(e) {
+                            if (e.key === 'Tab') {
+                                e.preventDefault();
+                                const start = this.selectionStart;
+                                const end = this.selectionEnd;
+                                this.value = this.value.substring(0, start) + '\t' + this.value.substring(end);
+                                this.selectionStart = this.selectionEnd = start + 1;
+                                updateCursor();
+                            }
+                        });
+                    }
+                    if (settings['workbench.colorTheme'] && settings['workbench.colorTheme'].toLowerCase().includes('light')) {
+                        isDark = false;
+                        document.getElementById('ide').classList.add('theme-light');
+                        themeToggle.textContent = '亮色';
+                    }
+                } catch (e) {
+                    showToast('应用设置时出错: ' + e.message, true);
+                }
+            }
+
+            // ----- 存储与恢复 -----
+            function saveState() {
+                const filesData = {};
+                let count = 0;
+                for (const [key, file] of fileMap) {
+                    if (count >= 10) break;
+                    filesData[key] = { name: file.name, content: file.content, lang: file.lang, icon: file.icon,
+                    path: file.path };
+                    count++;
+                }
+                setCookie(COOKIE_KEYS.FILES, filesData);
+                setCookie(COOKIE_KEYS.CURRENT_FILE, currentFileKey);
+                setCookie(COOKIE_KEYS.OPEN_TABS, openTabs);
+                setCookie(COOKIE_KEYS.THEME, isDark ? 'dark' : 'light');
+                setCookie(COOKIE_KEYS.BG_COLOR, customBg);
+                if (bgImageData) setCookie(COOKIE_KEYS.BG_IMAGE, bgImageData);
+                setCookie(COOKIE_KEYS.BG_BLUR, bgBlurInput.value);
+                const collapsed = fileTreeEl.classList.contains('collapsed');
+                setCookie(COOKIE_KEYS.SIDEBAR, collapsed ? 'collapsed' : 'expanded');
+            }
+
+            function restoreState() {
+                const filesData = getCookie(COOKIE_KEYS.FILES);
+                if (filesData) {
+                    for (const [key, data] of Object.entries(filesData)) {
+                        fileMap.set(key, data);
+                    }
+                }
+
+                const current = getCookie(COOKIE_KEYS.CURRENT_FILE);
+                if (current) currentFileKey = current;
+
+                const tabs = getCookie(COOKIE_KEYS.OPEN_TABS);
+                if (tabs && Array.isArray(tabs)) openTabs = tabs;
+
+                const theme = getCookie(COOKIE_KEYS.THEME);
+                if (theme === 'light') {
+                    isDark = false;
+                    document.getElementById('ide').classList.add('theme-light');
+                    themeToggle.textContent = '亮色';
+                } else {
+                    isDark = true;
+                    document.getElementById('ide').classList.remove('theme-light');
+                    themeToggle.textContent = '暗色';
+                }
+
+                const bgColor = getCookie(COOKIE_KEYS.BG_COLOR);
+                if (bgColor) {
+                    customBg = bgColor;
+                    bgColorInput.value = bgColor;
+                    applyBg(bgColor);
+                }
+
+                const bgImageDataRestored = getCookie(COOKIE_KEYS.BG_IMAGE);
+                if (bgImageDataRestored) {
+                    bgImageData = bgImageDataRestored;
+                    bgImage.style.backgroundImage = `url(${bgImageDataRestored})`;
+                    bgImage.style.backgroundSize = 'cover';
+                    bgImage.style.backgroundPosition = 'center';
+                    bgImage.classList.add('loaded');
+                    bgLayer.style.background = 'transparent';
+                }
+
+                const blur = getCookie(COOKIE_KEYS.BG_BLUR);
+                if (blur) {
+                    bgBlurInput.value = blur;
+                    blurValue.textContent = blur + 'px';
+                    const blurVal = `blur(${blur}px)`;
+                    bgImage.style.backdropFilter = blurVal;
+                    document.querySelectorAll('#file-tree, #editor-tabs, #editor-textarea, #editor-status, #status-bar, #settings-panel, .toast-item')
+                        .forEach(el => {
+                            el.style.backdropFilter = blurVal;
+                        });
+                }
+
+                const sidebar = getCookie(COOKIE_KEYS.SIDEBAR);
+                if (sidebar === 'collapsed') {
+                    applySidebarState(true);
+                } else {
+                    applySidebarState(false);
+                }
+
+                const githubUser = getCookie(COOKIE_KEYS.GITHUB_USER);
+                const githubToken = getCookie(COOKIE_KEYS.GITHUB_TOKEN);
+                if (githubUser && githubToken) {
+                    setLoggedIn(githubUser, githubToken);
+                }
+
+                const vscodeSettings = getCookie(COOKIE_KEYS.VSCODE_SETTINGS);
+                if (vscodeSettings) {
+                    applyVSCodeSettings(vscodeSettings);
+                }
             }
 
             // ----- Toast -----
@@ -322,22 +692,20 @@
 
             // ----- Storage check -----
             function isStorageAvailable() {
-                try { sessionStorage.setItem('_test','1'); sessionStorage.removeItem('_test'); return true; }
-                catch(e) { return false; }
+                try { sessionStorage.setItem('_test', '1');
+                    sessionStorage.removeItem('_test'); return true; } catch (e) { return false; }
             }
 
-            // ----- File menu handling (fixed + dynamic) -----
+            // ----- File menu handling -----
             function positionFileMenu() {
                 const btnRect = fileMenuBtn.getBoundingClientRect();
                 const menuRect = fileMenu.getBoundingClientRect();
                 const spacing = 6;
                 let left = Math.round(btnRect.left);
-                // prefer aligning left edges, but keep inside viewport
                 if (left + menuRect.width > window.innerWidth - 10) {
                     left = Math.max(10, window.innerWidth - menuRect.width - 10);
                 }
                 let top = Math.round(btnRect.bottom + spacing);
-                // if not enough space below, show above
                 if (top + menuRect.height > window.innerHeight - 10) {
                     top = Math.max(10, btnRect.top - menuRect.height - spacing);
                 }
@@ -351,13 +719,13 @@
                 fileMenu.setAttribute('aria-hidden', 'false');
                 fileMenuBtn.setAttribute('aria-expanded', 'true');
                 positionFileMenu();
-                // listen for one-time events
                 setTimeout(() => {
                     window.addEventListener('resize', onWindowHideMenu);
                     window.addEventListener('scroll', onWindowHideMenu, true);
                     document.addEventListener('keydown', onEscapeHideMenu);
                 }, 0);
             }
+
             function closeFileMenu() {
                 menuOpen = false;
                 fileMenu.classList.remove('open');
@@ -367,11 +735,15 @@
                 window.removeEventListener('scroll', onWindowHideMenu, true);
                 document.removeEventListener('keydown', onEscapeHideMenu);
             }
+
             function toggleMenu(open) {
                 const should = (open !== undefined) ? !!open : !menuOpen;
-                if (should) openFileMenu(); else closeFileMenu();
+                if (should) openFileMenu();
+                else closeFileMenu();
             }
+
             function onWindowHideMenu() { closeFileMenu(); }
+
             function onEscapeHideMenu(e) { if (e.key === 'Escape') closeFileMenu(); }
 
             fileMenuBtn.addEventListener('click', (e) => {
@@ -385,12 +757,14 @@
                 }
             });
 
-            // Ensure menu not blurred
             fileMenu.style.backdropFilter = 'none';
 
-            menuOpenFolder.addEventListener('click', () => { toggleMenu(false); hiddenFolderInput.click(); });
-            menuOpenFile.addEventListener('click', () => { toggleMenu(false); hiddenFileInput.click(); });
-            menuDownload.addEventListener('click', () => { toggleMenu(false); downloadCurrentFile(); });
+            menuOpenFolder.addEventListener('click', () => { toggleMenu(false);
+                hiddenFolderInput.click(); });
+            menuOpenFile.addEventListener('click', () => { toggleMenu(false);
+                hiddenFileInput.click(); });
+            menuDownload.addEventListener('click', () => { toggleMenu(false);
+                downloadCurrentFile(); });
 
             // ----- Sidebar collapse -----
             function applySidebarState(collapsed) {
@@ -403,18 +777,12 @@
                     sidebarToggle.innerHTML = '<i class="fas fa-angle-left"></i>';
                     fileTreeEl.setAttribute('aria-expanded', 'true');
                 }
-                try { localStorage.setItem(SIDEBAR_KEY, collapsed ? '1' : '0'); } catch (e) {}
+                setCookie(COOKIE_KEYS.SIDEBAR, collapsed ? 'collapsed' : 'expanded');
             }
             sidebarToggle.addEventListener('click', () => {
                 const collapsed = fileTreeEl.classList.contains('collapsed');
                 applySidebarState(!collapsed);
             });
-            // restore on load
-            try {
-                const saved = localStorage.getItem(SIDEBAR_KEY);
-                if (saved === '1') applySidebarState(true);
-                else applySidebarState(false);
-            } catch (e) { applySidebarState(false); }
 
             // ----- File tree & tabs -----
             function renderFileTree() {
@@ -441,6 +809,7 @@
                     fileTreeEl.appendChild(item);
                 });
                 updateStatusFiles();
+                saveState();
             }
 
             function renderTabs(activeKey) {
@@ -451,7 +820,8 @@
                     const tab = document.createElement('button');
                     tab.className = 'tab-item' + (key === activeKey ? ' active' : '');
                     tab.setAttribute('data-key', key);
-                    tab.innerHTML = `<i class="${file.icon}"></i><span>${file.name}</span><span class="tab-close" data-key="${key}">×</span>`;
+                    tab.innerHTML =
+                        `<i class="${file.icon}"></i><span>${file.name}</span><span class="tab-close" data-key="${key}">×</span>`;
                     tab.addEventListener('click', (e) => {
                         if (e.target.classList.contains('tab-close')) {
                             e.stopPropagation();
@@ -462,6 +832,7 @@
                     });
                     editorTabs.appendChild(tab);
                 });
+                saveState();
             }
 
             function loadFile(key) {
@@ -476,8 +847,8 @@
                 });
                 renderTabs(key);
                 editor.focus();
-                // reposition file menu if open (keeps it visually consistent)
                 if (menuOpen) positionFileMenu();
+                saveState();
             }
 
             function closeTab(key) {
@@ -488,9 +859,13 @@
                 if (currentFileKey === key) {
                     const newKey = openTabs[Math.min(idx, openTabs.length - 1)] || openTabs[0];
                     if (newKey) loadFile(newKey);
-                    else { currentFileKey = null; editor.value = ''; fileLang.textContent = '文本'; renderTabs(null); }
+                    else { currentFileKey = null;
+                        editor.value = '';
+                        fileLang.textContent = '文本';
+                        renderTabs(null); }
                 } else { renderTabs(currentFileKey); }
                 renderFileTree();
+                saveState();
             }
 
             function addFile(path, content) {
@@ -539,6 +914,7 @@
                     if (!currentFileKey && validKeys.length > 0) loadFile(validKeys[0]);
                     else { renderTabs(currentFileKey); }
                     updateStatusFiles();
+                    saveState();
                 });
             }
 
@@ -555,6 +931,75 @@
                 cursorPos.textContent = `行 ${row}, 列 ${col}`;
             }
 
+            // ----- Helpers -----
+            function getFileExtension(filename) {
+                const i = filename.lastIndexOf('.');
+                return i > 0 ? filename.substring(i + 1).toLowerCase() : '';
+            }
+
+            function getLangFromExt(ext) {
+                const map = {
+                    'js': 'JavaScript',
+                    'ts': 'TypeScript',
+                    'py': 'Python',
+                    'java': 'Java',
+                    'c': 'C',
+                    'cpp': 'C++',
+                    'go': 'Go',
+                    'rb': 'Ruby',
+                    'php': 'PHP',
+                    'swift': 'Swift',
+                    'html': 'HTML',
+                    'css': 'CSS',
+                    'json': 'JSON',
+                    'xml': 'XML',
+                    'yaml': 'YAML',
+                    'toml': 'TOML',
+                    'md': 'Markdown',
+                    'txt': '文本',
+                    'sh': 'Shell',
+                    'rs': 'Rust',
+                    'kt': 'Kotlin',
+                    'dart': 'Dart',
+                    'lua': 'Lua',
+                    'r': 'R',
+                    'sql': 'SQL'
+                };
+                return map[ext] || '文本';
+            }
+
+            function getIconFromExt(ext) {
+                const map = {
+                    'js': 'fab fa-js-square',
+                    'ts': 'fab fa-js-square',
+                    'html': 'fab fa-html5',
+                    'css': 'fab fa-css3-alt',
+                    'json': 'fas fa-cog',
+                    'md': 'fas fa-file-alt',
+                    'py': 'fab fa-python',
+                    'java': 'fab fa-java',
+                    'go': 'fas fa-code',
+                    'rb': 'fas fa-gem',
+                    'php': 'fab fa-php',
+                    'swift': 'fab fa-swift',
+                    'rs': 'fas fa-cog',
+                    'kt': 'fas fa-code',
+                    'dart': 'fas fa-code',
+                    'lua': 'fas fa-code',
+                    'sh': 'fas fa-terminal',
+                    'xml': 'fas fa-code',
+                    'yaml': 'fas fa-code',
+                    'toml': 'fas fa-code',
+                    'sql': 'fas fa-database',
+                    'txt': 'fas fa-file-alt'
+                };
+                return map[ext] || 'fas fa-file';
+            }
+
+            function generateKey(path) {
+                return path.replace(/[^a-zA-Z0-9]/g, '_');
+            }
+
             // Editor events
             editor.addEventListener('input', function() {
                 if (currentFileKey) {
@@ -562,19 +1007,10 @@
                     if (file) file.content = this.value;
                 }
                 updateCursor();
+                saveState();
             });
             editor.addEventListener('click', updateCursor);
             editor.addEventListener('keyup', updateCursor);
-            editor.addEventListener('keydown', function(e) {
-                if (e.key === 'Tab') {
-                    e.preventDefault();
-                    const start = this.selectionStart;
-                    const end = this.selectionEnd;
-                    this.value = this.value.substring(0, start) + '  ' + this.value.substring(end);
-                    this.selectionStart = this.selectionEnd = start + 2;
-                    updateCursor();
-                }
-            });
 
             // File open
             hiddenFolderInput.addEventListener('change', function() {
@@ -593,17 +1029,25 @@
                     return;
                 }
                 const file = fileMap.get(currentFileKey);
-                if (!file) return;
-                const blob = new Blob([file.content], { type: 'text/plain;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = file.name;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showToast(`已下载 ${file.name}`);
+                if (!file) {
+                    showToast('文件内容不存在', true);
+                    return;
+                }
+                try {
+                    const content = file.content || '';
+                    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = file.name || 'untitled.txt';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    setTimeout(() => URL.revokeObjectURL(url), 5000);
+                    showToast(`已下载: ${file.name}`);
+                } catch (err) {
+                    showToast('下载失败: ' + err.message, true);
+                }
             }
 
             // ----- Settings -----
@@ -625,12 +1069,14 @@
                     bgColorInput.value = '#f0f0f0';
                     applyBg('#f0f0f0');
                 }
+                saveState();
             });
 
             // Background color
             bgColorInput.addEventListener('input', function() {
                 applyBg(this.value);
                 customBg = this.value;
+                saveState();
             });
 
             function applyBg(color) {
@@ -650,27 +1096,34 @@
                     const dataUrl = ev.target.result;
                     bgImageData = dataUrl;
                     bgImage.style.backgroundImage = `url(${dataUrl})`;
+                    bgImage.style.backgroundSize = 'cover';
+                    bgImage.style.backgroundPosition = 'center';
                     bgImage.classList.add('loaded');
                     bgLayer.style.background = 'transparent';
                     showToast('背景图片已加载');
+                    saveState();
                 };
                 reader.readAsDataURL(file);
                 this.value = '';
             });
 
-            // Background blur — 注意：文件菜单不应用模糊
+            // Background blur
             bgBlurInput.addEventListener('input', function() {
                 const val = this.value;
                 blurValue.textContent = val + 'px';
                 const blur = `blur(${val}px)`;
                 bgImage.style.backdropFilter = blur;
-                // 应用到所有毛玻璃元素，但排除文件菜单
-                document.querySelectorAll('#file-tree, #editor-tabs, #editor-textarea, #editor-status, #status-bar, #settings-panel, .toast-item').forEach(el => {
-                    el.style.backdropFilter = blur;
-                });
-                // 确保文件菜单不被模糊
+                document.querySelectorAll('#file-tree, #editor-tabs, #editor-textarea, #editor-status, #status-bar, #settings-panel, .toast-item')
+                    .forEach(el => {
+                        el.style.backdropFilter = blur;
+                    });
                 fileMenu.style.backdropFilter = 'none';
+                saveState();
             });
+
+            // Import VSCode settings from settings panel
+            const importVscodeBtn = document.getElementById('import-vscode-btn');
+            importVscodeBtn.addEventListener('click', () => hiddenVscodeInput.click());
 
             // ----- GitHub OAuth (PKCE) -----
             function generateRandomString(length) {
@@ -679,20 +1132,22 @@
                 for (let i = 0; i < length; i++) result += possible.charAt(Math.floor(Math.random() * possible.length));
                 return result;
             }
+
             async function sha256(plain) {
                 const encoder = new TextEncoder();
                 const data = encoder.encode(plain);
                 const hash = await crypto.subtle.digest('SHA-256', data);
                 return hash;
             }
+
             function base64url(buffer) {
                 const bytes = new Uint8Array(buffer);
                 let binary = '';
                 for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-                return btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+                return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
             }
 
-            async function startGitHubOAuth() {
+            async function startGitHubOAuth(fromOOBE = false) {
                 if (!isStorageAvailable()) {
                     showToast('存储不可用，请使用非沙盒环境打开', true);
                     return;
@@ -713,6 +1168,9 @@
                         code_challenge: challenge,
                         code_challenge_method: 'S256'
                     });
+                    if (fromOOBE) {
+                        sessionStorage.setItem('oobe_pending', 'true');
+                    }
                     window.location.href = `https://github.com/login/oauth/authorize?${params.toString()}`;
                 } catch (err) {
                     showToast('OAuth 启动失败: ' + err.message, true);
@@ -762,6 +1220,16 @@
                     const user = await userResp.json();
                     const login = user.login || '用户';
                     setLoggedIn(login, accessToken);
+
+                    const fromOOBE = sessionStorage.getItem('oobe_pending');
+                    if (fromOOBE) {
+                        sessionStorage.removeItem('oobe_pending');
+                        oobeGithubDone = true;
+                        oobeGithubStatus.textContent = `已登录: ${login}`;
+                        oobeGithubStatus.className = 'status done';
+                        updateOOBEButton();
+                    }
+
                     showToast(`已登录为 ${login}`);
                     if (window.history && window.history.replaceState) {
                         window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
@@ -774,15 +1242,20 @@
             }
 
             let loggedIn = false;
+
             function setLoggedIn(user, accessToken) {
                 loggedIn = true;
                 githubUserLabel.textContent = user;
-                githubStatus.innerHTML = `<i class="fab fa-github"></i> ${user} <i class="fas fa-check-circle" style="color:#6aba6a;margin-left:4px;"></i>`;
+                githubStatus.innerHTML =
+                    `<i class="fab fa-github"></i> ${user} <i class="fas fa-check-circle" style="color:#6aba6a;margin-left:4px;"></i>`;
                 githubStatus.classList.add('logged-in');
                 document.getElementById('ide').classList.add('logged-in');
                 githubLoginBtn.innerHTML = `<i class="fas fa-sign-out-alt"></i> 登出`;
                 statusGit.innerHTML = `<i class="fas fa-github"></i> ${user}`;
+                setCookie(COOKIE_KEYS.GITHUB_USER, user);
+                setCookie(COOKIE_KEYS.GITHUB_TOKEN, accessToken);
             }
+
             function logout() {
                 loggedIn = false;
                 githubUserLabel.textContent = '';
@@ -791,36 +1264,55 @@
                 document.getElementById('ide').classList.remove('logged-in');
                 githubLoginBtn.innerHTML = `<i class="fab fa-github"></i> 登录`;
                 statusGit.innerHTML = `<i class="fas fa-github"></i> 未连接`;
+                removeCookie(COOKIE_KEYS.GITHUB_USER);
+                removeCookie(COOKIE_KEYS.GITHUB_TOKEN);
                 showToast('已登出');
             }
+
             githubLoginBtn.addEventListener('click', function() {
                 if (loggedIn) logout();
-                else startGitHubOAuth();
+                else startGitHubOAuth(false);
             });
 
             // ----- Init -----
             async function init() {
+                restoreState();
                 await handleOAuthCallback();
-                const sampleContent = `// IDEata
-// 点击顶部「文件」按钮，垂直展开菜单
-// 打开文件夹 / 打开文件 / 下载`;
-                const key = addFile('README.md', sampleContent);
-                openTabs.push(key);
+
+                // 如果没有文件，添加示例
+                if (fileMap.size === 0) {
+                    const sampleContent = `// IDEata
+// 点击「文件」→ 打开文件夹 或 打开文件
+// 设置中可调整主题、背景等`;
+                    const key = addFile('README.md', sampleContent);
+                    openTabs.push(key);
+                }
+
                 renderFileTree();
-                loadFile(key);
+                if (currentFileKey && fileMap.has(currentFileKey)) {
+                    loadFile(currentFileKey);
+                } else if (fileMap.size > 0) {
+                    const firstKey = Array.from(fileMap.keys())[0];
+                    loadFile(firstKey);
+                }
                 updateStatusFiles();
+
+                // 检查首次启动或URL hash - 显示OOBE
+                checkOOBEStatus();
+
                 setTimeout(() => editor.focus(), 300);
-                bgBlurInput.value = 4;
-                blurValue.textContent = '4px';
-                // 确保文件菜单不被模糊
                 fileMenu.style.backdropFilter = 'none';
             }
+
             init();
 
-            // Expose position update on resize to keep menu aligned if open
             window.addEventListener('resize', () => { if (menuOpen) positionFileMenu(); });
+
+            window.addEventListener('beforeunload', () => {
+                saveState();
+            });
 
         })();
     </script>
 </body>
-  </html>
+    </html>
