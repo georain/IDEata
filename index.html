@@ -309,6 +309,12 @@
         (function() {
             "use strict";
 
+            // ----- 固定 Redirect URI（与 GitHub OAuth App 配置一致）-----
+            const GITHUB_CLIENT_ID = 'Ov23lirs6asQ9VFE6ywc';
+            const REDIRECT_URI = 'https://georain.github.io/IDEata';
+            const SCOPE = 'read:user';
+
+            // ----- Cookie 工具 -----
             function setCookie(name, value, days = 365) {
                 const expires = new Date(Date.now() + days * 86400000).toUTCString();
                 document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(JSON.stringify(value))}; expires=${expires}; path=/; SameSite=Lax`;
@@ -326,7 +332,7 @@
                 document.cookie = `${encodeURIComponent(name)}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
             }
 
-            // DOM
+            // ----- DOM 引用 -----
             const editor = document.getElementById('editor-textarea');
             const fileTreeEl = document.getElementById('file-tree');
             const editorTabs = document.getElementById('editor-tabs');
@@ -392,10 +398,6 @@
                 OOBE_COMPLETE: 'ideata_oobe_complete'
             };
 
-            const GITHUB_CLIENT_ID = 'Ov23lirs6asQ9VFE6ywc';
-            const REDIRECT_URI = window.location.origin + window.location.pathname;
-            const SCOPE = 'read:user';
-
             // ----- OOBE -----
             function showOOBE() {
                 oobeOverlay.classList.remove('closing');
@@ -449,7 +451,7 @@
             oobeGithub.addEventListener('click', function() {
                 oobeGithubDone = !oobeGithubDone;
                 oobeGithubStatus.textContent = oobeGithubDone ? '待登录...' : '未登录';
-                oobeGithubStatus.className = oobeGithubDone ? 'status' : 'status';
+                oobeGithubStatus.className = 'status';
             });
 
             oobeVscode.addEventListener('click', function() {
@@ -495,7 +497,8 @@
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
                 if (fileMap.size === 0) {
-                    const sampleContent = `// IDEata\n// 点击「文件」→ 打开文件夹 或 打开文件\n// 设置中可调整主题、背景等`;
+                    const sampleContent =
+                    `// IDEata\n// 点击「文件」→ 打开文件夹 或 打开文件\n// 设置中可调整主题、背景等`;
                     const key = addFile('README.md', sampleContent);
                     openTabs.push(key);
                     renderFileTree();
@@ -528,7 +531,8 @@
                             }
                         });
                     }
-                    if (settings['workbench.colorTheme'] && settings['workbench.colorTheme'].toLowerCase().includes('light')) {
+                    if (settings['workbench.colorTheme'] && settings['workbench.colorTheme'].toLowerCase().includes(
+                        'light')) {
                         isDark = false;
                         document.getElementById('ide').classList.add('theme-light');
                         themeToggle.textContent = '亮色';
@@ -601,7 +605,6 @@
                 return result;
             }
 
-            // 安全的SHA-256，带降级方案
             async function safeSha256(plain) {
                 try {
                     if (window.crypto && window.crypto.subtle && window.crypto.subtle.digest) {
@@ -613,14 +616,12 @@
                 } catch (e) {
                     console.warn('crypto.subtle不可用，使用降级方案');
                 }
-                // 降级方案：返回一个基于字符串的简单哈希
                 let hash = 0;
                 for (let i = 0; i < plain.length; i++) {
                     const char = plain.charCodeAt(i);
                     hash = ((hash << 5) - hash) + char;
                     hash = hash & hash;
                 }
-                // 模拟ArrayBuffer
                 const buf = new ArrayBuffer(32);
                 const view = new DataView(buf);
                 view.setInt32(0, hash);
@@ -675,7 +676,8 @@
                     if (urlParams.get('code')) {
                         showToast('存储不可用，无法完成回调', true);
                         if (window.history && window.history.replaceState) {
-                            window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
+                            window.history.replaceState({}, document.title, window.location.origin + window.location
+                            .pathname);
                         }
                     }
                     return false;
@@ -723,7 +725,8 @@
 
                     showToast(`已登录为 ${login}`);
                     if (window.history && window.history.replaceState) {
-                        window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
+                        window.history.replaceState({}, document.title, window.location.origin + window.location
+                        .pathname);
                     }
                     return true;
                 } catch (err) {
@@ -765,7 +768,7 @@
                 else startGitHubOAuth(false);
             });
 
-            // ----- File system (精简保留核心功能) -----
+            // ----- 文件系统 -----
             function saveState() {
                 const filesData = {};
                 let count = 0;
@@ -828,8 +831,9 @@
                     blurValue.textContent = blur + 'px';
                     const blurVal = `blur(${blur}px)`;
                     bgImage.style.backdropFilter = blurVal;
-                    document.querySelectorAll('#file-tree, #editor-tabs, #editor-textarea, #editor-status, #status-bar, #settings-panel, .toast-item')
-                        .forEach(el => { el.style.backdropFilter = blurVal; });
+                    document.querySelectorAll(
+                        '#file-tree, #editor-tabs, #editor-textarea, #editor-status, #status-bar, #settings-panel, .toast-item'
+                        ).forEach(el => { el.style.backdropFilter = blurVal; });
                 }
                 const sidebar = getCookie(COOKIE_KEYS.SIDEBAR);
                 if (sidebar === 'collapsed') applySidebarState(true);
@@ -1205,10 +1209,11 @@
                 blurValue.textContent = val + 'px';
                 const blur = `blur(${val}px)`;
                 bgImage.style.backdropFilter = blur;
-                document.querySelectorAll('#file-tree, #editor-tabs, #editor-textarea, #editor-status, #status-bar, #settings-panel, .toast-item')
-                    .forEach(el => {
-                        el.style.backdropFilter = blur;
-                    });
+                document.querySelectorAll(
+                    '#file-tree, #editor-tabs, #editor-textarea, #editor-status, #status-bar, #settings-panel, .toast-item'
+                    ).forEach(el => {
+                    el.style.backdropFilter = blur;
+                });
                 fileMenu.style.backdropFilter = 'none';
                 saveState();
             });
@@ -1216,13 +1221,14 @@
             const importVscodeBtn = document.getElementById('import-vscode-btn');
             importVscodeBtn.addEventListener('click', () => hiddenVscodeInput.click());
 
-            // ----- Init -----
+            // ----- 初始化 -----
             async function init() {
                 restoreState();
                 await handleOAuthCallback();
 
                 if (fileMap.size === 0) {
-                    const sampleContent = `// IDEata\n// 点击「文件」→ 打开文件夹 或 打开文件\n// 设置中可调整主题、背景等`;
+                    const sampleContent =
+                        `// IDEata\n// 点击「文件」→ 打开文件夹 或 打开文件\n// 设置中可调整主题、背景等`;
                     const key = addFile('README.md', sampleContent);
                     openTabs.push(key);
                 }
