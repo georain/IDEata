@@ -316,14 +316,22 @@
 
             // ----- Cookie 工具 -----
             function setCookie(name, value, days = 365) {
-                const expires = new Date(Date.now() + days * 86400000).toUTCString();
-                document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(JSON.stringify(value))}; expires=${expires}; path=/; SameSite=Lax`;
+                try {
+                    const expires = new Date(Date.now() + days * 86400000).toUTCString();
+                    document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(JSON.stringify(value))}; expires=${expires}; path=/; SameSite=Lax`;
+                } catch (e) {
+                    console.warn('Cookie 写入失败:', e);
+                }
             }
 
             function getCookie(name) {
-                const match = document.cookie.match(new RegExp('(^| )' + encodeURIComponent(name) + '=([^;]+)'));
-                if (match) {
-                    try { return JSON.parse(decodeURIComponent(match[2])); } catch (e) { return null; }
+                try {
+                    const match = document.cookie.match(new RegExp('(^| )' + encodeURIComponent(name) + '=([^;]+)'));
+                    if (match) {
+                        return JSON.parse(decodeURIComponent(match[2]));
+                    }
+                } catch (e) {
+                    console.warn('Cookie 读取失败:', e);
                 }
                 return null;
             }
@@ -505,7 +513,7 @@
                     loadFile(key);
                     updateStatusFiles();
                 }
-                showToast('设置完成，欢迎使用 IDEata');
+                showToast('设置完成');
             }
 
             function applyVSCodeSettings(settings) {
@@ -790,32 +798,7 @@
             }
 
             function restoreState() {
-                const filesData = getCookie(COOKIE_KEYS.FILES);
-                if (filesData) {
-                    for (const [key, data] of Object.entries(filesData)) {
-                        fileMap.set(key, data);
-                    }
-                }
-                const current = getCookie(COOKIE_KEYS.CURRENT_FILE);
-                if (current) currentFileKey = current;
-                const tabs = getCookie(COOKIE_KEYS.OPEN_TABS);
-                if (tabs && Array.isArray(tabs)) openTabs = tabs;
-                const theme = getCookie(COOKIE_KEYS.THEME);
-                if (theme === 'light') {
-                    isDark = false;
-                    document.getElementById('ide').classList.add('theme-light');
-                    themeToggle.textContent = '亮色';
-                } else {
-                    isDark = true;
-                    document.getElementById('ide').classList.remove('theme-light');
-                    themeToggle.textContent = '暗色';
-                }
-                const bgColor = getCookie(COOKIE_KEYS.BG_COLOR);
-                if (bgColor) {
-                    customBg = bgColor;
-                    bgColorInput.value = bgColor;
-                    applyBg(bgColor);
-                }
+                // 恢复背景图片
                 const bgImageDataRestored = getCookie(COOKIE_KEYS.BG_IMAGE);
                 if (bgImageDataRestored) {
                     bgImageData = bgImageDataRestored;
@@ -825,6 +808,20 @@
                     bgImage.classList.add('loaded');
                     bgLayer.style.background = 'transparent';
                 }
+
+                // 恢复背景颜色
+                const bgColor = getCookie(COOKIE_KEYS.BG_COLOR);
+                if (bgColor) {
+                    customBg = bgColor;
+                    bgColorInput.value = bgColor;
+                    if (!bgImageData) {
+                        applyBg(bgColor);
+                    } else {
+                        bgLayer.style.background = 'transparent';
+                    }
+                }
+
+                // 恢复背景模糊
                 const blur = getCookie(COOKIE_KEYS.BG_BLUR);
                 if (blur) {
                     bgBlurInput.value = blur;
@@ -835,12 +832,42 @@
                         '#file-tree, #editor-tabs, #editor-textarea, #editor-status, #status-bar, #settings-panel, .toast-item'
                         ).forEach(el => { el.style.backdropFilter = blurVal; });
                 }
+
+                // 恢复主题
+                const theme = getCookie(COOKIE_KEYS.THEME);
+                if (theme === 'light') {
+                    isDark = false;
+                    document.getElementById('ide').classList.add('theme-light');
+                    themeToggle.textContent = '亮色';
+                } else {
+                    isDark = true;
+                    document.getElementById('ide').classList.remove('theme-light');
+                    themeToggle.textContent = '暗色';
+                }
+
+                // 恢复文件
+                const filesData = getCookie(COOKIE_KEYS.FILES);
+                if (filesData) {
+                    for (const [key, data] of Object.entries(filesData)) {
+                        fileMap.set(key, data);
+                    }
+                }
+                const current = getCookie(COOKIE_KEYS.CURRENT_FILE);
+                if (current) currentFileKey = current;
+                const tabs = getCookie(COOKIE_KEYS.OPEN_TABS);
+                if (tabs && Array.isArray(tabs)) openTabs = tabs;
+
+                // 恢复侧边栏状态
                 const sidebar = getCookie(COOKIE_KEYS.SIDEBAR);
                 if (sidebar === 'collapsed') applySidebarState(true);
                 else applySidebarState(false);
+
+                // 恢复GitHub登录状态
                 const githubUser = getCookie(COOKIE_KEYS.GITHUB_USER);
                 const githubToken = getCookie(COOKIE_KEYS.GITHUB_TOKEN);
                 if (githubUser && githubToken) setLoggedIn(githubUser, githubToken);
+
+                // 恢复VSCode设置
                 const vscodeSettings = getCookie(COOKIE_KEYS.VSCODE_SETTINGS);
                 if (vscodeSettings) applyVSCodeSettings(vscodeSettings);
             }
@@ -1181,6 +1208,9 @@
                 bgLayer.style.background = color;
                 if (!bgImageData) {
                     bgLayer.style.background = color;
+                } else {
+                    // 有背景图片时，背景层透明
+                    bgLayer.style.background = 'transparent';
                 }
             }
 
@@ -1223,7 +1253,9 @@
 
             // ----- 初始化 -----
             async function init() {
+                // 先恢复所有状态（包括背景）
                 restoreState();
+
                 await handleOAuthCallback();
 
                 if (fileMap.size === 0) {
